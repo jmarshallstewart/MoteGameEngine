@@ -1,0 +1,220 @@
+This document describes how to use Mingine to write a game. Mingine is a native executable written in C++. It is called Mingine because it is a minimal game engine. Really, it is just a thin shim that glues together SDL 2 and lua. It is cross-platform and should compile and run on any platform supported by SDL 2.
+
+Mingine is a game engine because you can use it to make multiple different game titles. Each title you create will use the same executable but will run a different set of lua scripts. Mingine provides access to common functionality needed by most games, such as drawing images, playing music and sounds, reading input from the keyboard, mouse, and game pads, etc.
+
+The first section below describes how to set up a new project using Mingine. The second and final section lists all of the functions Mingine provides for use within your lua scripts.
+
+
+I. Making a game with Mingine
+
+The game executable is a scriptable game engine that can be controlled via lua scripts. Lua is a scripting language. If you don't know what a scripting language is, google it and then come back:)
+
+Welcome back! You can use the game executable to make your own games. The game executable always looks for a lua script located at scripts/config.lua. Config.lua loads a bunch of standard, general-utility lua scripts, and then loads one more script to launch a particular game. Though you probably want to leave the general scripts alone, you can modify that final script to point config.lua to your game. Though you could load multiple scripts via config.lua (indeed, it is just a normal lua script file, so you can do anything you could normally do in a lua script), it is a good practice to use a single lua file to launch a game from within config.lua. That single file can itself load any number of scripts.
+
+After config.lua is finished, the game engine will expect three functions to be defined within the lua state used by the game:
+
+Start()
+Update()
+Draw()
+
+These functions take no parameters and return no values. Start() is called once, after all engine systems are ready and config.lua has finished executing. Update() is called every frame, followed by a call to Draw(). There is no guarantee that Update() and Draw() will be called in a 1:1 ratio. Depending on the frame time for your game, Draw() may be called multiple times between calls to Update(). Mingine attempts to update the game at 60fps but draw as fast as it can.
+
+In summary, here's what you do: Create a lua script that has Start(), Update(), and Draw() defined. Load this script by calling dofile(your script here) in config.lua. Use Start() to create a window and load the assets needed for your game. Use Update() to update the player's position in response to user input, etc. Use Draw() to draw the images needed for your game. 
+
+
+II. The Mingine API
+
+II.i Notation
+
+Though lua variables do not have types, the values they reference do have types. The following function descriptions list both a type and name for arguments to functions, and in some cases return types, even though this is not correct syntax in either C++ or lua. The types are still important since they inform you of what inputs these functions expect.
+
+Some function parameters are listed as optional. However, you must define optional parameters in the order they appear from left to right (for example, there is no way in the DrawImage functions to pass a scale but use the default value for angle, since the angle parameter comes before the scale parameter in the parameter list).
+
+
+II.ii Other Notes
+
+1. All drawing functions use screen-space coordinates (with the top-left corner of the game's window being the origin 0, 0). +X is to the right, +Y is toward the bottom of the screen.
+
+2. When the type of a function parameter is listed as "number," that means it can be any lua number (i.e., doubles under the hood).
+
+3. The Load*() functions return references to assets such as images and audio files that are used by the game. Assets are loaded by passing a file path to one of the various Load*() functions. The asset management system in Mingine considers each path to represent a unique asset, so if an asset is currently loaded at the requested path, the reference returned will point to the previously loaded asset instead of redundantly loading the asset again.
+
+4. You will see the term "tile atlas" used in the descriptions below. This is also commonly called a "sprite sheet" or "texture atlas"--the gist is that it is a bunch of separate images packed into one single larger image. For 2D animations, it is often the case that separate images of animation are laid out in sequential order within a tile atlas, and each frame of animation is the same width and height in pixels. Though tile atlases in general can have multiple rows and columns, Mingine supports only a single row (a "strip") of animation frames. Mingine cannot index two-dimensional arrangments of images within a tile atlas.
+
+
+II.iii Mingine Functions
+
+You can call these 33 native functions from your lua scripts.
+
+LoadImage(pathToImageFile) 
+    pathToImageFile: path to the actual image asset, for example, LoadImage("spaceGame/space.png"). .png is supported.
+    
+    returns: a reference to the asset that can be used to retrieve it later.
+
+LoadFont(pathToFontFile, fontSize)
+    pathToFontFile: path to the actual font asset, for example, LoadFont("spaceGame/spaceFont.ttf"). .ttf format is supported.
+
+    returns: a reference to the asset that can be used to retrieve it later.
+
+LoadSound(pathToSoundFile)
+    pathToSoundFile: path to the actual audio asset, for example, LoadSound("spaceGame/sfx/hit.wav") .wav and .ogg are supported.
+
+    returns: a reference to the asset that can be used to retrieve it later.
+
+LoadMusic(pathToMusicFile)
+    pathToMusicFile: path to the actual asset, for example, LoadMusic("spaceGame/music/level1.ogg") .wav and .ogg are supported.
+
+    returns: a reference to the asset that can be used to retrieve it later.
+    
+GetDrawColor()
+    returns: byte, byte, byte, byte
+    
+    returns the RGBA color value currently being used by the renderer. The color is returned as four integers which will have the value 0-255.
+
+GetDrawLogicalSize()
+    returns: int, int
+    
+    Returns two integers representing the current logical x and y size the renderer is using. Logical size is different from screen size, so logical size is a feature to support resolution-independent draw calls.
+
+GetDrawScale()
+    returns: number, number
+
+    Returns two number values representing the current x and y scale values being used by the renderer. This is useful for caching off the current draw scale so that a temporary value can be set, used, and then discarded, after which the previous draw scale is restored.
+    
+SetDrawColor(byte r, byte g, byte b, byte a)
+    The parameters of this function represent an RGB color and an alpha value. All draw calls made after calling this function will use the assigned color, until a different color is set as the draw color via a subsequent call to SetDrawColor()
+
+SetDrawLogicalSize(int pixelsWidth, int pixelsHeight)
+    Sets the size of the coordinate space to be used for all draw calls. The final resulting frame is then scaled to accomodate the current size of the window, but all drawing can be done in a consistent coordinate space without needing to worry about the size of the final result.
+
+SetDrawScale(number x, number y)
+    x: horizontal scale (1.0 = 1 pixel)
+    y: vertical scale (1.0 = 1 pixel)
+    
+    Set the scale used by the renderer for all subsequent draw calls (until SetDrawScale is called with different arguments).
+
+DrawImage(reference imageAsset, int x, int y, optional float angle, optional float scale, optional byte r, optional byte g, optional byte b)
+    imageAsset: a reference to an asset loaded via LoadImage(). For DrawImageFrame(), this is assumed to be a tile atlas in which multiple frames of animation (all uniform in size) are laid out left to right in a single row. The renderer uses the frame width and height, along with a frame index to draw a particular frame out of the larger tile atlas.
+    x, y: the position to draw the image (x, y will be the coordinate of the topleft corner of the rendered image).
+    scale: a uniform scale to apply when drawing the image. Scale will multiply on top of whatever draw scale is currently being used by the renderer. 
+    angle: an angle measured in degrees. angle 0 is +x, and positive rotation is clockwise.
+    r, g, b: Color used to modulate the colors in the imageAsset. Though these parameters are listed as optional, you must pass them all if you pass any. In other words, you can't just pass an r and assume a default g and b. You must pass r, g, b together.
+
+DrawImageFrame(reference imageAsset, int x, int y, int frameWidth, int frameHeight, int frameIndex, optional float angle, optional float scale, optional byte r, optional byte g, optional byte b)
+    imageAsset: a reference to an asset loaded via LoadImage(). For DrawImageFrame(), this is assumed to be a tile atlas in which multiple frames of animation (all uniform in size) are laid out left to right in a single row. The renderer uses the frame width and height, along with a frame index to draw a particular frame out of the larger tile atlas.
+    x, y: the position to draw the image (x, y will be the coordinate of the topleft corner of the rendered image).
+    frameWidth: the width of a single frame within the imageAsset.
+    frameHeight: the height of a single frame within the imageAsset (should = the height of the overall image, since Mingine supports tile atlases with one row only).
+    frameIndex: the exact frame to use within a sprite atlas. The first frame is numbered 1 and grows to the right.
+    scale: a uniform scale to apply when drawing the image. Scale will multiply on top of whatever draw scale is currently being used by the renderer. 
+    angle: an angle measured in degrees. angle 0 is +x, and positive rotation is clockwise.
+    r, g, b: Color used to modulate the colors in the imageAsset. Though these parameters are listed as optional, you must pass them all if you pass any. In other words, you can't just pass an r and assume a default g and b. You must pass r, g, b together.
+
+    DrawImageFrame() is used to draw a subsection of a larger image to the screen. See Section II.ii for a description of how a tile atlas should be formatted for use with Mingine (the short version: as a single strip of frames, each framing having the same width and height as the others).
+
+DrawText(string text, int x, int y, reference fontAsset, byte r, g, b)
+    fontAsset: A value returned from a call to the function LoadFont()
+
+    Draw the string passed via the text parameter to the screen at position x, y using the specified font asset. The text will be colored using the parameters r, g, b.
+    
+DrawPoint(int x, int y)
+    Color a single pixel onscreen at the position x, y. The renderer's current draw color is used as the pixel color.
+
+DrawLine(int startX, int startY, int endX, int endY)
+    Draw a line from the point startX, startY to the point endX, endY. The renderer's current draw color is used to draw the line.
+
+DrawCircle(int x, int y, int radius)
+    Draws an outline of a circle at the position x,y of the given radius. The renderer's current draw color is used to draw the circle.
+
+DrawRect(int x, int y, int width, int height)
+    Draws an outline of a rectangle at the given position with the given dimension. The renderer's current draw color is used to draw the rectangle.
+
+FillRect(int x, int y, int width, int height)
+    Draws a rectangle at the given location with the given dimensions. The rectangle is filled with a solid color. The renderer's current draw color is used to draw the rectangle.
+    
+PlaySound(reference audioAsset)
+    audioAsset: a reference to a the value returned by the function LoadSound()
+    
+    Plays the requested audio clip in a fire-and-forget fashion. There is no way to stop the sound or otherwise manipulate it after the request to play has been made. PlaySound() is not guaranteed to play the requested sound--for example, audio hardware has a limited number of channels, and a sound might not play if many other sounds are already playing.
+
+PlayMusic(reference musicAsset)
+    musicAsset: a reference to the value returned by the function LoadMusic().
+    
+    Plays an audio file that loops forever (or until another music file is played). The audio asset may be streamed as needed rather than loaded completely into memory. If music is already playing when PlayMusic() is called, the current music will stop before the next music asset begins playing.
+
+IsKeyDown(int keyIndex)
+    keyIndex: uses SDL scancodes. Mingine duplicates these scan codes in the file scanCodes.lua. If you use the constants from that file, the keys will map to their expected values.
+
+    returns: bool
+    
+    Returns true if the given key is currently being pressed on the keyboard. Otherwise returns false.
+    
+IsKeyReleased(int keyIndex)
+    keyIndex: uses SDL scancodes. Mingine duplicates these scan codes in the file scanCodes.lua. If you use the constants from that file, the keys will map to their expected values.
+    
+    returns: bool
+    
+    Returns true on the first frame that the given key is released. All other times, it returns false. This can be used to "debounce" key input when you only care about the first frame the key is released, not whether the key is currently released.
+
+IsKeyPressed(int keyIndex)
+    keyIndex: uses SDL scancodes. Mingine duplicates these scan codes in the file scanCodes.lua. If you use the constants from that file, the keys will map to their expected values.
+
+    returns: bool
+    
+    Returns true on the first frame that the given key is pressed. All other times, it returns false. This can be used to "debounce" key input when you only care about the first frame the key is pressed, not whether the key is currently pressed.
+
+IsMouseButtonDown(int buttonIndex)
+    buttonIndex: index of the button on the mouse. (typically, left mouse button is 1 and right mouse button is 3)
+    
+    returns: bool
+    
+    Returns true if the button assigned to the given buttonIndex is currently in the down or pressed position. Returns false otherwise.
+
+GetMousePosition()
+    returns: int, int
+
+    Returns two values x, y representing the mouse cursor's current position measured in window pixels.
+
+SetWindowTitle(string title)
+    Sets the title of the window itself. The actual appearance depends on platform dress. Note that the window title is only visible when the borders, etc. of the window are visible, so this title is not visible is fullscreen mode.
+    
+CreateWindow(int width, int height, optional bool isFullScreen )
+    Creates a window of the specified dimensions.
+    isFullScreen: if true, uses the entire screen with no platform dress. If false, runs as a window with borders, title bar, etc. (i.e., typical platform dressing). Optional.
+
+Log(string text)
+    Writes text to stdout (in Visual Studio, the console)
+
+Quit()
+    Requests that the entire application shut down all subsystems cleanly and exit.
+    
+ClearScreen(byte r, byte g, byte b)
+    Color every pixel of the screen to the color represented by r, g, b.
+    
+GetFrameTime()
+    returns: int
+
+    Returns the time in milliseconds that elapsed while updating the previous frame of the game.
+
+SetAssetBasePath(string path)
+    Sets the root directory to use for loading all assets such as images, fonts, audio, etc. All requests
+    to load assets will be prepended automatically by this base path, so you can omit the base directory portion
+    of the path when calling Load* functions in scripts.
+    
+LoadTmxFile(string pathToTmxFile)
+    pathToTmxFile: for example, LoadTmxFile("maps/garden.tmx")
+    
+    returns: string (the map as a lua script)
+    
+    Provides a "lowest common denominator" way to load data from a .tmx file. .tmx is a format generated by the popular game development tool Tiled.
+    
+    This function is not particularly generic since it loads object layers in a specific way (treating them as collision), this
+    function is included in mingine since it is easily customizable for your particular use case. Tiled is a great tool and supporting the tmx format is one fairly reusable way to get level data into your game.
+    
+    The way this function is implemented is generic: It converts the tmx data into a lua script that can be called in order to create a table that contains the map data. This way, tmx loading is subsumed into the existing scripting framework, and both build time and runtime conversion are supported.
+    
+    The best way to understand what this function does is to:
+    1. Create a tmx file in Tiled.
+    2. Pass it to this function as a string.
+    3. Save the return value as a file.
+    4. Look at that file. This is a lua script. It may be just what you need, but you will probably want to change it. To do this, you will need to modify Mingine from source.
