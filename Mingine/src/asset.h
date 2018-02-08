@@ -1,6 +1,6 @@
 #pragma once
 
-typedef unsigned __int8 Uint8;
+typedef unsigned char uint8_t;
 
 namespace mingine {
 
@@ -42,8 +42,8 @@ class Image : public Asset
 public:
 	bool load(const LoadParameters& loadParameters) override;
 	void free() override;
-	void draw(int x, int y, double angle, double scale, Uint8 r, Uint8 g, Uint8 b);
-	void drawFrame(int x, int y, int frameWidth, int frameHeight, int frame, double angle, double scale, Uint8 r, Uint8 g, Uint8 b);
+	void draw(int x, int y, double angle, double scale, uint8_t r, uint8_t g, uint8_t b);
+	void drawFrame(int x, int y, int frameWidth, int frameHeight, int frame, double angle, double scale, uint8_t r, uint8_t g, uint8_t b);
 
 private:
 	int width{ 0 };
@@ -55,7 +55,7 @@ class Font : public Asset
 public:
 	bool load(const LoadParameters& loadParameters) override;
 	void free() override;
-	void draw(const char* text, int x, int y, Uint8 r, Uint8 g, Uint8 b);
+	void draw(const char* text, int x, int y, uint8_t r, uint8_t g, uint8_t b);
 };
 
 class Sound : public Asset

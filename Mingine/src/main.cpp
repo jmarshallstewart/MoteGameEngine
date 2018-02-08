@@ -1,7 +1,7 @@
 #include <chrono>
 #include <string>
-#include <SDL_main.h>
-#include "lua.hpp"
+#include <SDL2/SDL.h>
+#include <lua5.3/lua.hpp>
 #include "platform.h"
 #include "assetDatabase.h"
 #include "tmxToLua.h"
@@ -174,10 +174,10 @@ int SetDrawColor(lua_State* state)
 {
 	RenderParameters renderParameters;
 
-	renderParameters.u8[0] = (Uint8)lua_tointeger(state, 1);
-	renderParameters.u8[1] = (Uint8)lua_tointeger(state, 2);
-	renderParameters.u8[2] = (Uint8)lua_tointeger(state, 3);
-	renderParameters.u8[3] = (Uint8)lua_tointeger(state, 4);
+	renderParameters.u8[0] = (uint8_t)lua_tointeger(state, 1);
+	renderParameters.u8[1] = (uint8_t)lua_tointeger(state, 2);
+	renderParameters.u8[2] = (uint8_t)lua_tointeger(state, 3);
+	renderParameters.u8[3] = (uint8_t)lua_tointeger(state, 4);
 
 	setRenderState(Render::DrawColor, renderParameters);
 	return 0;
@@ -227,15 +227,15 @@ int DrawImage(lua_State* state)
 		scale = lua_tonumber(state, 5);
 	}
 
-	Uint8 r = 0xff;
-	Uint8 g = 0xff;
-	Uint8 b = 0xff;
+	uint8_t r = 0xff;
+	uint8_t g = 0xff;
+	uint8_t b = 0xff;
 
 	if (numArguments >= 8)
 	{
-		r = (Uint8)lua_tointeger(state, 6);
-		g = (Uint8)lua_tointeger(state, 7);
-		b = (Uint8)lua_tointeger(state, 8);
+		r = (uint8_t)lua_tointeger(state, 6);
+		g = (uint8_t)lua_tointeger(state, 7);
+		b = (uint8_t)lua_tointeger(state, 8);
 	}
 
     Image* image = assetDatabase.get<Image>(id);
@@ -267,15 +267,15 @@ int DrawImageFrame(lua_State* state)
 		scale = lua_tonumber(state, 8);
 	}
 
-	Uint8 r = 0xff;
-	Uint8 g = 0xff;
-	Uint8 b = 0xff;
+	uint8_t r = 0xff;
+	uint8_t g = 0xff;
+	uint8_t b = 0xff;
 
 	if (numArguments >= 11)
 	{
-		r = (Uint8)lua_tointeger(state, 9);
-		g = (Uint8)lua_tointeger(state, 10);
-		b = (Uint8)lua_tointeger(state, 11);
+		r = (uint8_t)lua_tointeger(state, 9);
+		g = (uint8_t)lua_tointeger(state, 10);
+		b = (uint8_t)lua_tointeger(state, 11);
 	}
 	
     Image* image = assetDatabase.get<Image>(id);
@@ -290,9 +290,9 @@ int DrawText(lua_State* state)
     int x = (int)lua_tonumber(state, 2);
     int y = (int)lua_tonumber(state, 3);
     int fontId = (int)lua_tonumber(state, 4);
-    Uint8 r = (Uint8)lua_tonumber(state, 5);
-    Uint8 g = (Uint8)lua_tonumber(state, 6);
-    Uint8 b = (Uint8)lua_tonumber(state, 7);
+    uint8_t r = (uint8_t)lua_tonumber(state, 5);
+    uint8_t g = (uint8_t)lua_tonumber(state, 6);
+    uint8_t b = (uint8_t)lua_tonumber(state, 7);
 
     Font* font = assetDatabase.get<Font>(fontId);
     font->draw(text, x, y, r, g, b);
@@ -460,9 +460,9 @@ int GetFrameTime(lua_State* state)
 
 int ClearScreen(lua_State* state)
 {
-	Uint8 r = (Uint8)lua_tointeger(state, 1);
-	Uint8 g = (Uint8)lua_tointeger(state, 2);
-	Uint8 b = (Uint8)lua_tointeger(state, 3);
+	uint8_t r = (uint8_t)lua_tointeger(state, 1);
+	uint8_t g = (uint8_t)lua_tointeger(state, 2);
+	uint8_t b = (uint8_t)lua_tointeger(state, 3);
 	clearScreen(r, g, b);
 	return 0;
 }
