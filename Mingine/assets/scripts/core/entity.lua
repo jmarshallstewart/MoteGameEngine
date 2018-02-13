@@ -175,3 +175,7 @@ function StartAnimation(e, clipName)
     e.frame = 1
     e.frameTimer = e.frameDuration
 end
+
+function TurnTo(e, directionVector)
+    e.angle = math.deg(math.atan(directionVector.y, directionVector.x))
+end
