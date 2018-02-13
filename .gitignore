@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+.vs/Mingine/v14/.suo
+Debug/
+packages/
+Mingine/Mingine.vcxproj.user
