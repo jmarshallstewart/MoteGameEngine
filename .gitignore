@@ -35,3 +35,6 @@ Debug/
 packages/
 Mingine/Mingine.vcxproj.user
 Mingine/assets/scripts/myProjects/
+Mingine/Release/
+Release/
+Mingine/assets/scripts/privateProjects/
