@@ -1,6 +1,6 @@
 #pragma once
 
-typedef unsigned __int8 Uint8;
+typedef unsigned char uint8_t;
 
 namespace mingine {
 
@@ -21,7 +21,7 @@ namespace Render
 union RenderParameters
 {
 	int i[4];
-	Uint8 u8[4];
+	uint8_t u8[4];
 	float f[2];
 };
 
@@ -40,7 +40,7 @@ void drawLine(int startX, int startY, int endX, int endY);
 void drawCircle(int x, int y, int radius);
 void drawRect(int x, int y, int w, int h);
 void fillRect(int x, int y, int w, int h);
-void clearScreen(Uint8 r, Uint8 g, Uint8 b);
+void clearScreen(uint8_t r, uint8_t g, uint8_t b);
 void beginFrame();
 void presentFrame();
 void stopMusic();

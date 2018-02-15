@@ -1,8 +1,8 @@
 #include "asset.h"
 #include "platform.h"
-#include <SDL_image.h>
-#include <SDL_mixer.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
 
 namespace mingine {
 
@@ -49,7 +49,7 @@ void Image::free()
 }
 
 // param angle = angle in degrees, + rotation = clockwise
-void Image::draw(int x, int y, double angle, double scale, Uint8 r, Uint8 g, Uint8 b)
+void Image::draw(int x, int y, double angle, double scale, uint8_t r, uint8_t g, uint8_t b)
 {
 	SDL_Rect destRect;
 	destRect.x = x;
@@ -61,7 +61,7 @@ void Image::draw(int x, int y, double angle, double scale, Uint8 r, Uint8 g, Uin
 	SDL_RenderCopyEx(renderer, (SDL_Texture*)assetData, nullptr, &destRect, angle, nullptr, SDL_FLIP_NONE);
 }
 
-void Image::drawFrame(int x, int y, int frameWidth, int frameHeight, int frame, double angle, double scale, Uint8 r, Uint8 g, Uint8 b)
+void Image::drawFrame(int x, int y, int frameWidth, int frameHeight, int frame, double angle, double scale, uint8_t r, uint8_t g, uint8_t b)
 {
 	SDL_Rect destRect;
 	destRect.x = x;
@@ -93,7 +93,7 @@ void Font::free()
     assetData = nullptr;
 }
 
-void Font::draw(const char* text, int x, int y, Uint8 r, Uint8 g, Uint8 b)
+void Font::draw(const char* text, int x, int y, uint8_t r, uint8_t g, uint8_t b)
 {
 	SDL_Surface* textDestination = nullptr;
 
