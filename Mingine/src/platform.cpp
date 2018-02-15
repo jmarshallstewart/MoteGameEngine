@@ -1,7 +1,7 @@
 #include "platform.h"
-#include <SDL_image.h>
-#include <SDL_mixer.h>
-#include <SDL_ttf.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
 #include <cassert>
 #include <cstdio>
 
@@ -337,7 +337,7 @@ void fillRect(int x, int y, int w, int h)
 	SDL_RenderFillRect(renderer, &rect);
 }
 
-void clearScreen(Uint8 r, Uint8 g, Uint8 b)
+void clearScreen(uint8_t r, uint8_t g, uint8_t b)
 {
 	SDL_SetRenderDrawColor(renderer, r, g, b, 0xff);
 	SDL_RenderClear(renderer);
