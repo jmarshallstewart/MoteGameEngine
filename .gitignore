@@ -31,3 +31,14 @@
 *.out
 *.app
 *mingine_Run
+
+# Visual Studio files
+*.tlog
+*.nupkg
+*.ipch
+*.ipdb
+*.iobj
+*.idb
+*.db
+*.opendb
+packages/
