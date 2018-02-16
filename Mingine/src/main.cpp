@@ -1,7 +1,14 @@
 #include <chrono>
 #include <string>
+
+#ifdef _WIN32
+#include <SDL.h>
+#include <lua.hpp>
+#else
 #include <SDL2/SDL.h>
 #include <lua5.3/lua.hpp>
+#endif
+
 #include "platform.h"
 #include "assetDatabase.h"
 #include "tmxToLua.h"
