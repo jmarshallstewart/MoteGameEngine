@@ -27,6 +27,7 @@ public:
 	Asset();
 	virtual ~Asset();
 
+	// prevents copy via assignment or copy constructor
 	Asset(const Asset&) = delete;
 	Asset& operator= (const Asset&) = delete;
 
