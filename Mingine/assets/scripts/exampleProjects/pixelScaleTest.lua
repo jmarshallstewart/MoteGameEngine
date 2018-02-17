@@ -1,8 +1,8 @@
 ------------------------------------------------------------------------------
 -- constants
 ------------------------------------------------------------------------------
-SCREEN_WIDTH = 1920
-SCREEN_HEIGHT = 1080
+SCREEN_WIDTH = 1600
+SCREEN_HEIGHT = 900
 
 SCALE = 7
 
@@ -13,7 +13,7 @@ LOGICAL_HEIGHT = math.floor(1080 / SCALE)
 -- core functions
 ------------------------------------------------------------------------------
 function Start()
-    CreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT)
+    CreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, true)
     SetWindowTitle("Pixel Scale Test")
     
     SetDrawLogicalSize(LOGICAL_WIDTH, LOGICAL_HEIGHT)
@@ -24,7 +24,6 @@ function Update()
 end
 
 function Draw()
-    scaleX, scaleY = GetDrawScale()
     SetDrawScale(SCALE, SCALE)
 
     for r = 0, LOGICAL_HEIGHT - 1 do
@@ -36,6 +35,4 @@ function Draw()
                 DrawPoint(c, r)
         end
     end
-    
-    SetDrawScale(1, 1)
 end
