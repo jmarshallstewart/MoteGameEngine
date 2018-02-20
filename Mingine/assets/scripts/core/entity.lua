@@ -38,7 +38,7 @@ function ResetEntity(e)
     e.a = 255
     e.drag = 0.9
     e.maxSpeed = 16
-    e.speed = 10
+    e.speed = 10 -- used only with WobbleSeek. 
     e.frameDuration = 1000 / 4
     e.frameTimer = e.frameDuration
     e.angle = 0
@@ -63,9 +63,9 @@ function UpdateEntity(e)
     e.velocity.y = e.velocity.y + e.acceleration.y
         
     -- remove very small x velocities
-    if math.abs(e.velocity.x) < 0.2 then
-        e.velocity.x = 0
-    end
+    --if math.abs(e.velocity.x) < 0.2 then
+    --    e.velocity.x = 0
+    --end
     
     -- clamp velocity to maxSpeed
     if Magnitude(e.velocity.x, e.velocity.y) > e.maxSpeed then
@@ -159,6 +159,10 @@ function SetEntityScale(e, scale)
     e.scale = scale
     e.width = math.floor(e.frameWidth * e.scale)
     e.height = math.floor(e.frameHeight * e.scale)
+end
+
+function GetSpeed(e)
+    return Magnitude(e.velocity.x, e.velocity.y)
 end
 
 function AddAnimationFrame(e, clipName, frameIndex)

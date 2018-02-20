@@ -318,10 +318,10 @@ int DrawPoint(lua_State* state)
 
 int DrawLine(lua_State* state)
 {
-	int startX = (int)lua_tointeger(state, 1);
-	int startY = (int)lua_tointeger(state, 2);
-	int endX = (int)lua_tointeger(state, 3);
-	int endY = (int)lua_tointeger(state, 4);
+	int startX = (int)lua_tonumber(state, 1);
+	int startY = (int)lua_tonumber(state, 2);
+	int endX = (int)lua_tonumber(state, 3);
+	int endY = (int)lua_tonumber(state, 4);
 	
 	drawLine(startX, startY, endX, endY);
 	return 0;
