@@ -71,7 +71,8 @@ function Draw()
         
     DrawEntity(agent)
     --line over agent represents direction of acceleration
-    DrawLine(agent.x, agent.y, agent.x + agent.acceleration.x * 32, agent.y + agent.acceleration.y * 32) 
+    local accDirX, accDirY = Mad(agent, agent.acceleration, 32)
+    DrawLine(agent.x, agent.y, accDirX, accDirY) 
     
     DrawText("Speed: " .. string.format("%.3f", GetSpeed(agent)), 8, 9, font, 255, 255, 255)
 end
