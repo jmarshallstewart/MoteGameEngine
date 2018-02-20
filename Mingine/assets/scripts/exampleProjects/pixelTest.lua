@@ -19,9 +19,6 @@ function Update()
 end
 
 function Draw()
-    local centerX = SCREEN_WIDTH / 2
-	local centerY = SCREEN_HEIGHT / 2
-
     --background
     for r = 0, SCREEN_HEIGHT - 1 do
         for c = 0, SCREEN_WIDTH - 1 do
@@ -32,8 +29,8 @@ function Draw()
             DrawPoint(c, r)
             
             --circle
-            local dx = c - centerX
-            local dy = r - centerY
+            local dx = c - SCREEN_WIDTH / 2
+            local dy = r - SCREEN_HEIGHT / 2
             local distance = math.sqrt(dx * dx + dy * dy)
             if distance <= CIRCLE_RADIUS then
                 if (r + c) % 2 == 0 then

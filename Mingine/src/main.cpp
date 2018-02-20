@@ -1,12 +1,14 @@
 #include <chrono>
 #include <string>
-#if _WIN32
-	#include <SDL_main.h>
-	#include <lua.hpp>
+
+#ifdef _WIN32
+#include <SDL.h>
+#include <lua.hpp>
 #else
-	#include <SDL2/SDL.h>
-	#include <lua5.3/lua.hpp>
+#include <SDL2/SDL.h>
+#include <lua5.3/lua.hpp>
 #endif
+
 #include "platform.h"
 #include "assetDatabase.h"
 #include "tmxToLua.h"
@@ -316,10 +318,10 @@ int DrawPoint(lua_State* state)
 
 int DrawLine(lua_State* state)
 {
-	int startX = (int)lua_tointeger(state, 1);
-	int startY = (int)lua_tointeger(state, 2);
-	int endX = (int)lua_tointeger(state, 3);
-	int endY = (int)lua_tointeger(state, 4);
+	int startX = (int)lua_tonumber(state, 1);
+	int startY = (int)lua_tonumber(state, 2);
+	int endX = (int)lua_tonumber(state, 3);
+	int endY = (int)lua_tonumber(state, 4);
 	
 	drawLine(startX, startY, endX, endY);
 	return 0;

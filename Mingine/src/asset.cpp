@@ -1,14 +1,14 @@
 #include "asset.h"
 #include "platform.h"
 
-#if _WIN32
-	#include <SDL_image.h>
-	#include <SDL_mixer.h>
-	#include <SDL_ttf.h>
+#ifdef _WIN32
+#include <SDL_image.h>
+#include <SDL_mixer.h>
+#include <SDL_ttf.h>
 #else
-	#include <SDL2/SDL_image.h>
-	#include <SDL2/SDL_mixer.h>
-	#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_mixer.h>
+#include <SDL2/SDL_ttf.h>
 #endif
 
 namespace mingine {

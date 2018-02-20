@@ -39,3 +39,14 @@ Mingine/Release/
 Release/
 Mingine/assets/scripts/privateProjects/
 *mingine_Run
+
+# Visual Studio files
+*.tlog
+*.nupkg
+*.ipch
+*.ipdb
+*.iobj
+*.idb
+*.db
+*.opendb
+packages/

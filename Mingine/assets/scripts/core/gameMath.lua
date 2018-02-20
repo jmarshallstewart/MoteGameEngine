@@ -48,6 +48,17 @@ function To(from, to)
     return to.x - from.x, to.y - from.y
 end
 
+--mad is shorthand for "multiply then add"
+--this is useful for adding a scaled vector as an offset from a point
+--represented as a vector
+--
+--parameters:
+--vec1 and vec2 are tables that have .x and .y properties. 
+--scale is a number.
+function Mad(vec1, vec2, scale)
+    return vec1.x + vec2.x * scale, vec1.y + vec2.y * scale
+end
+
 -- POINTS
 
 function DistanceSquared(x1, y1, x2, y2)
