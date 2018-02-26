@@ -11,6 +11,10 @@ MAX_ALIGNMENT_DISTANCE = 40
 MAX_COHESION_DISTANCE = 600
 MAX_SEPARATION_DISTANCE = 30
 
+WANDER_CIRCLE_OFFSET = 50
+WANDER_CIRCLE_RADIUS = 30
+WANDER_ANGLE_DELTA_MAX = 0.2
+
 function Seek(agent, targetX, targetY)
     local x, y = VectorTo(agent.x, agent.y, targetX, targetY)
     x, y = Normalize(x, y)
@@ -23,6 +27,21 @@ function Flee(agent, targetX, targetY)
     x, y = Normalize(x, y)
     
     return x, y
+end
+
+function Wander(agent)
+    local toCircle = {}
+    Set(toCircle, agent.velocity.x, agent.velocity.y, WANDER_CIRCLE_OFFSET) 
+   
+    agent.wanderAngle = agent.wanderAngle + math.random() * WANDER_ANGLE_DELTA_MAX - WANDER_ANGLE_DELTA_MAX * 0.5
+    
+    local toPointOnCircle = {}
+    Set(toPointOnCircle, math.cos(agent.wanderAngle), math.sin(agent.wanderAngle), WANDER_CIRCLE_RADIUS)
+    
+    local targetX = agent.x + toCircle.x + toPointOnCircle.x
+    local targetY = agent.y + toCircle.y + toPointOnCircle.y
+    
+    return Seek(agent, targetX, targetY)
 end
 
 function Separation(agent, neighbors)

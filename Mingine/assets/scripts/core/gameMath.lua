@@ -11,6 +11,11 @@ function CreateZeroVector()
     return CreateVector(0, 0)
 end
 
+-- returns a new vector (a lua table w/ x and y properties)
+function CloneVector(original)
+    return CreateVector(original.x, original.y)
+end
+
 function SetVector(v, x, y)
     v.x = x
     v.y = y
@@ -46,6 +51,13 @@ end
 --arguments should both be 2d vectors
 function To(from, to)
     return to.x - from.x, to.y - from.y
+end
+
+--sets outVector to the direction and magnitude specified in the parameters.
+--direction does not need to be normalized for this function.
+function Set(outVector, directionX, directionY, magnitude)
+    outVector.x, outVector.y = Normalize(directionX, directionY)
+    outVector.x, outVector.y = Scale(outVector.x, outVector.y, magnitude)
 end
 
 --mad is shorthand for "multiply then add"

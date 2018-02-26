@@ -1,9 +1,5 @@
 dofile(scriptDirectory .. "core/steering.lua")
 
-------------------------------------------------------------------------------
--- constants
-------------------------------------------------------------------------------
-
 SCREEN_WIDTH = 1024
 SCREEN_HEIGHT = 768
 
@@ -12,11 +8,6 @@ ARRIVE_DISTANCE = 16
 targetWaypoint = 1
 MAX_ACCELERATION = 1.0 -- how fast can the agent change direction and speed?
 
-------------------------------------------------------------------------------
--- required mingine functions
-------------------------------------------------------------------------------
-
--- called once, at the start of the game
 function Start()
     CreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT)
     SetWindowTitle("Path Following Example")
@@ -42,9 +33,8 @@ function Update()
     --next waypoint on the path is our seek target. 
     --accelerate toward that.
     local x, y = Seek(agent, next.x, next.y)
-    x, y = Normalize(x, y)
-    agent.acceleration.x, agent.acceleration.y = Scale(x, y, MAX_ACCELERATION)
-        
+    Set(agent.acceleration, x, y, MAX_ACCELERATION)
+            
     --the angle of our sprite should match its own velocity    
     TurnTo(agent, agent.velocity)
     UpdateEntity(agent)
