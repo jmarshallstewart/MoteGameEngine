@@ -570,6 +570,7 @@ int main(int argc, char* argv[])
 		beginFrame();
 		call(luaState, "Draw");
 		presentFrame();
+		//presentFrameRotating();
 	}
 	   
     stopMusic();
