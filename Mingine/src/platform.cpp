@@ -356,17 +356,14 @@ void beginFrame()
 	SDL_SetRenderTarget(renderer, backbuffer);
 }
 
-void presentFrame()
+// The code below can be used to rotate the backbuffer. This might be a useful effect
+// when transitioning to a new game state or something, but this is currently a w.i.p. It works here
+// but has not been exposed to script. Also, there are issues with fullscreen possibly, I forget.
+void presentFrameRotating()
 {
 	SDL_SetRenderTarget(renderer, nullptr);
-	
-	// the commented out code below is used to rotate the backbuffer. This might be a useful effect
-	// when transitioning to a new game state or something, but this is currently a wip. It works here
-	// but has not been exposed to script yet. (To see this effect, comment out the current call to SDL_RenderCopyEx(), and uncomment
-	// all of the commented code in the remainder of the function. Also, there may be a windowed/fullscreen issue here,
-	// I forget.)
 
-	/*static double angle = 0;
+	static double angle = 0;
 	int w = 0;
 	int h = 0;
 
@@ -381,12 +378,22 @@ void presentFrame()
 	destRect.w = w;
 	destRect.h = h;
 
-	SDL_Point center = { w / 2, h / 2 };*/
+	SDL_Point center = { w / 2, h / 2 };
+
+	clearScreen(0, 0, 0);
+	SDL_RenderCopyEx(renderer, backbuffer, nullptr, &destRect, angle, &center, SDL_FLIP_NONE);
+	angle += 0.4;
+
+	SDL_RenderPresent(renderer);
+}
+
+void presentFrame()
+{
+	SDL_SetRenderTarget(renderer, nullptr);
 			
 	clearScreen(0, 0, 0);
-	//SDL_RenderCopyEx(renderer, backbuffer, nullptr, &destRect, angle, &center, SDL_FLIP_NONE);
+
 	SDL_RenderCopyEx(renderer, backbuffer, nullptr, nullptr, 0, nullptr, SDL_FLIP_NONE);
-	//angle += 0.4;
 	SDL_RenderPresent(renderer);
 }
 
