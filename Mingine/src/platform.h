@@ -43,6 +43,7 @@ void fillRect(int x, int y, int w, int h);
 void clearScreen(uint8_t r, uint8_t g, uint8_t b);
 void beginFrame();
 void presentFrame();
+void presentFrameRotating();
 void stopMusic();
 void endUpdate();
 
