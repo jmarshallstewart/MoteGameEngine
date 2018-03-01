@@ -135,3 +135,9 @@ function CircleBoxOverlap(circle, box)
     return Distance(closestX, closestY, circle.x, circle.y) < circle.radius;
 end
 
+-- MISC
+
+function Clamp(value, min, max)
+    return math.min(math.max(value, min), max)
+end
+
