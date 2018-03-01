@@ -85,16 +85,19 @@ void writeLuaMapScript(const MapData& mapData, string& outScript)
 		outScript += "}\n"; // end of tiles
 	}
 
-	outScript += string(mapData.outTableName) + ".walkabilityGrid = {";
-
-	for (int i = 0; i < mapData.mapLength(); ++i)
+	if (mapData.walkabilityGrid != nullptr)
 	{
-		outScript += (mapData.walkabilityGrid[i] ? "1," : "0,");
-	}
+		outScript += string(mapData.outTableName) + ".walkabilityGrid = {";
 
-	// erase last comma
-	outScript.resize(outScript.size() - 1);
-	outScript += "}\n"; // end of tiles
+		for (int i = 0; i < mapData.mapLength(); ++i)
+		{
+			outScript += (mapData.walkabilityGrid[i] ? "1," : "0,");
+		}
+
+		// erase last comma
+		outScript.resize(outScript.size() - 1);
+		outScript += "}\n"; // end of walkability grid
+	}
 }
 
 int parseTmx(const char* tmxFile, const char* topPathToMatch, const char* outTableName, string& outScript)
@@ -185,48 +188,52 @@ int parseTmx(const char* tmxFile, const char* topPathToMatch, const char* outTab
 
 	// parse object groups
 	XMLElement* pObjectGroupElement = pMapElement->FirstChildElement("objectgroup");
-	if (pObjectGroupElement == nullptr) return XML_ERROR_PARSING_ELEMENT;
-
-	mapData.walkabilityGrid = new bool[mapData.mapLength()];
-	memset(mapData.walkabilityGrid, 1, mapData.mapLength());
-
-	while (pObjectGroupElement != nullptr)
+	if (pObjectGroupElement != nullptr)
 	{
-		const char * name = pObjectGroupElement->Attribute("name");
-		if (name == nullptr) return XML_ERROR_PARSING_ATTRIBUTE;
-		
-		snprintf(stringBuilderBuffer, sizeof(stringBuilderBuffer), "Parsing object group %s", name);
-		log(stringBuilderBuffer);
+		mapData.walkabilityGrid = new bool[mapData.mapLength()];
+		memset(mapData.walkabilityGrid, 1, mapData.mapLength());
 
-		if (strcmp(name, "NoWalk") == 0)
+		while (pObjectGroupElement != nullptr)
 		{
-			XMLElement* pListElement = pObjectGroupElement->FirstChildElement("object");
-
-			while (pListElement != nullptr)
+			const char * name = pObjectGroupElement->Attribute("name");
+			if (name == nullptr)
 			{
-				int x = readIntAttribute(pListElement, "x");
-				int y = readIntAttribute(pListElement, "y");
-				int w = readIntAttribute(pListElement, "width");
-				int h = readIntAttribute(pListElement, "height");
-
-				int row = y / mapData.tileSize;
-				int col = x / mapData.tileSize;
-				int colliderWidth = w / mapData.tileSize;
-				int colliderHeight = h / mapData.tileSize;
-
-				for (int r = row; r < row + colliderHeight; ++r)
-				{
-					for (int c = col; c < col + colliderWidth; ++c)
-					{
-						mapData.walkabilityGrid[c + r * mapData.width] = false;
-					}
-				}
-
-				pListElement = pListElement->NextSiblingElement("object");
+				return XML_ERROR_PARSING_ATTRIBUTE;
 			}
-		}
 
-		pObjectGroupElement = pObjectGroupElement->NextSiblingElement("objectgroup");
+			snprintf(stringBuilderBuffer, sizeof(stringBuilderBuffer), "Parsing object group %s", name);
+			log(stringBuilderBuffer);
+
+			if (strcmp(name, "NoWalk") == 0)
+			{
+				XMLElement* pListElement = pObjectGroupElement->FirstChildElement("object");
+
+				while (pListElement != nullptr)
+				{
+					int x = readIntAttribute(pListElement, "x");
+					int y = readIntAttribute(pListElement, "y");
+					int w = readIntAttribute(pListElement, "width");
+					int h = readIntAttribute(pListElement, "height");
+
+					int row = y / mapData.tileSize;
+					int col = x / mapData.tileSize;
+					int colliderWidth = w / mapData.tileSize;
+					int colliderHeight = h / mapData.tileSize;
+
+					for (int r = row; r < row + colliderHeight; ++r)
+					{
+						for (int c = col; c < col + colliderWidth; ++c)
+						{
+							mapData.walkabilityGrid[c + r * mapData.width] = false;
+						}
+					}
+
+					pListElement = pListElement->NextSiblingElement("object");
+				}
+			}
+
+			pObjectGroupElement = pObjectGroupElement->NextSiblingElement("objectgroup");
+		}
 	}
 
 	// write file

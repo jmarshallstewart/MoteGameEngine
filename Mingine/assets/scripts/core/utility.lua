@@ -20,3 +20,16 @@ function ClearTable(t)
         t[k] = nil
     end
 end
+
+-- returns true if table t has a value for the given key
+function Contains(t, key)
+    return t[key] ~= nil
+end
+
+function Pick(condition, trueReturnValue, falseReturnFalse)
+    if condition == true then
+        return trueReturnValue
+    else
+        return falseReturnFalse
+    end
+end

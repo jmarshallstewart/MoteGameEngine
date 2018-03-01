@@ -1,3 +1,10 @@
+-- this script is something like a unit test of various math
+-- functions. As new math functions are added to gameMath.lua,
+-- tests can be added here.
+--
+-- @TODO: tests for all functions
+-- @TODO: add an assert or other pass/fail mechanism for automatic testing.
+--
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
