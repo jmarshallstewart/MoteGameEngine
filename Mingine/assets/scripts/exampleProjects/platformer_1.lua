@@ -173,8 +173,7 @@ function Start()
     -- LoadTmxFile(assetDirectory .. "maps/platformer32.tmx")
     
     map.walkable = {1, 2} --indices of tiles that the player and other actors can walk through.
-
-    map.tileSize = map.tileSize
+    
     CreateWindow(map.width * map.tileSize, map.height * map.tileSize)
     SetWindowTitle("Platformer")
     

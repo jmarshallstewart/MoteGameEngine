@@ -2,11 +2,12 @@
 -- https://codeincomplete.com/posts/tiny-platformer/
 --
 -- This example extends the previous platformer project to include
--- pickups and enemies.
+-- exits to new maps and persistent player metrics.
 --
 
 --tuning parameters for player input
 
+STARTING_MAP = "level1"
 GRAVITY = 1.2
 MAX_SPEED = { x = 3.4375, y = 6.3 }
 LINEAR_ACCELERATION = 0.625 -- how fast the player accelerates when walking
@@ -16,13 +17,15 @@ FALLING_FRICTION_SCALE = 0.5
 FALLING_ACCELERATION_SCALE = 0.5
 SETTLE_TOLERANCE = 0.11 -- higher number indicates max penetration for player to snap to grid when coming to a stop.
 
-DEFAULT_PLAYER_START = {x = 10, y = 22}
+DEFAULT_PLAYER_START = {x = 1, y = 1}
 
 -- counts the number of times Update() has been called. Used only for animating the alpha on the treasures.
 frame = 0
 
 -- scales the default abilities of monsters.
 monsterScale = 0.3
+
+windowCreated = false
 
 -- helper functions
 
@@ -47,9 +50,6 @@ function SetPlayer(actor, x, y)
     actor.maxSpeedY = MAX_SPEED.y
     actor.jumpImpulse =  JUMP_IMPULSE
     actor.monster = false
-    actor.enemyDefeats = 0
-    actor.treasures = 0
-    actor.defeats = 0
 end
 
 function SetMonster(actor, x, y)
@@ -211,35 +211,58 @@ function UpdateActor(actor)
 end
 
 function UpdateTreasures()
-    for i = #treasures, 1, -1 do
-        if BoxesOverlapWH(treasures[i].x, treasures[i].y, 1, 1, player.x, player.y, 1, 1) then
-            table.remove(treasures, i)
-            player.treasures = player.treasures + 1
+    if treasures ~= nil then
+        for i = #treasures, 1, -1 do
+            if BoxesOverlapWH(treasures[i].x, treasures[i].y, 1, 1, player.x, player.y, 1, 1) then
+                table.remove(treasures, i)
+                player.treasures = player.treasures + 1
+            end
+        end
+    end
+end
+
+function UpdateExits()
+    if map.exit ~= nil then
+        for i = #map.exit, 1, -1 do
+            if BoxesOverlapWH(map.exit[i].x, map.exit[i].y, 1, 1, player.x, player.y, 1, 1) then
+                LoadMap(map.exit[i].map)
+                return
+            end
         end
     end
 end
 
 function UpdateMonsters()
-    for i = #monsters, 1, -1 do
-        local removed = false
-    
-        if BoxesOverlapWH(monsters[i].x, monsters[i].y, 1, 1, player.x, player.y, 1, 1) then
-            if (player.velocity.y > 0) and (monsters[i].y - player.y > 0.5) then
-                table.remove(monsters, i)
-                player.enemyDefeats = player.enemyDefeats + 1
-                removed = true
-            else
-                player.x = playerStart[1].x
-                player.y = playerStart[1].y
-                player.velocity.x = 0
-                player.velocity.y = 0
-                player.defeats = player.defeats + 1
+    if monsters ~= nil then
+        for i = #monsters, 1, -1 do
+            local removed = false
+        
+            if BoxesOverlapWH(monsters[i].x, monsters[i].y, 1, 1, player.x, player.y, 1, 1) then
+                if (player.velocity.y > 0) and (monsters[i].y - player.y > 0.5) then
+                    table.remove(monsters, i)
+                    player.enemyDefeats = player.enemyDefeats + 1
+                    removed = true
+                else
+                    player.x = map.playerStart[1].x
+                    player.y = map.playerStart[1].y
+                    player.velocity.x = 0
+                    player.velocity.y = 0
+                    player.defeats = player.defeats + 1
+                end
+            end
+            
+            if not removed then
+                UpdateActor(monsters[i])
             end
         end
-        
-        if not removed then
-            UpdateActor(monsters[i])
-        end
+    end
+end
+
+function DrawExits()
+    SetDrawColor(24, 255, 24, 255)
+    
+    for i = 1, #map.exit do
+        FillRect(map.exit[i].x * map.tileSize, map.exit[i].y * map.tileSize,  map.tileSize, map.tileSize)
     end
 end
 
@@ -250,6 +273,8 @@ function DrawWorld()
             DrawImageFrame(tileImage, x * map.tileSize, y * map.tileSize, map.tileSize, map.tileSize, tileImageIndex - 1, 0, 1)
         end
     end
+    
+    DrawExits()
 end
 
 function DrawPlayer()
@@ -258,70 +283,114 @@ function DrawPlayer()
 end
 
 function DrawMonsters()
-    SetDrawColor(24, 24, 24, 255)
-    
-    for i = 1, #monsters do
-        FillRect(monsters[i].x * map.tileSize, monsters[i].y * map.tileSize,  map.tileSize, map.tileSize)
+    if monsters ~= nil then
+        SetDrawColor(24, 24, 24, 255)
+        
+        for i = 1, #monsters do
+            FillRect(monsters[i].x * map.tileSize, monsters[i].y * map.tileSize,  map.tileSize, map.tileSize)
+        end
     end
 end
 
 function DrawTreasures()
-    local duration = 60
-    local half = duration / 2
-    local pulse = frame % duration
+    if treasures ~= nil then
+        local duration = 60
+        local half = duration / 2
+        local pulse = frame % duration
+        
+        local glow = 0
+        if pulse < half then
+            glow = pulse / half
+        else
+            glow = 1 - (pulse - half) / half;
+        end
+        
+        local alpha = math.floor( glow * 255 )    
+          
+        SetDrawColor(243, 246, 19, alpha)
+        
+        for i = 1, #treasures do
+            FillRect(treasures[i].x * map.tileSize, treasures[i].y * map.tileSize,  map.tileSize, map.tileSize)
+        end
+    end
+end
+
+-- create a new player object, but copy
+-- player metrics such as num treasures found
+-- from previous instance.
+function RefreshPlayer()
+    local numEnemyDefeats = 0
+    local numTreasures = 0
+    local numDefeats = 0
     
-    local glow = 0
-    if pulse < half then
-        glow = pulse / half
-    else
-        glow = 1 - (pulse - half) / half;
+    if player ~= nil then
+        numEnemyDefeats = player.enemyDefeats
+        numTreasures = player.treasures
+        numDefeats = player.defeats
     end
     
-    local alpha = math.floor( glow * 255 )    
-      
-    SetDrawColor(243, 246, 19, alpha)
+    player = {}
     
-    for i = 1, #treasures do
-        FillRect(treasures[i].x * map.tileSize, treasures[i].y * map.tileSize,  map.tileSize, map.tileSize)
+    player.enemyDefeats = numEnemyDefeats
+    player.treasures = numTreasures
+    player.defeats = numDefeats
+end
+
+function LoadMap(mapFile)
+    monsters = nil
+    treasures = nil
+    map = nil
+    
+    LoadTmxFile(assetDirectory .. "maps/" .. mapFile .. ".tmx")
+    
+    -- This example can handle maps with different tile sizes. For example, comment out the previous LoadTmxFile() call and uncomment this:
+    -- LoadTmxFile(assetDirectory .. "maps/platformer32.tmx")
+        
+    map.walkable = {1, 2} --indices of tiles that the player and other actors can walk through.
+    
+    RefreshPlayer()
+    
+    -- note that since the window is created once,
+    -- all maps will need to use this resolution unless
+    -- mingine is extended to resize.
+    if not windowCreated then
+                
+        CreateWindow(map.width * map.tileSize, map.height * map.tileSize)
+        
+        font = LoadFont("fonts/8_bit_pusab.ttf", 18)      
+               
+        windowCreated = true
+    end
+    
+    tileImage = LoadImage(map.tileAtlas)
+    SetWindowTitle("platformer 3: " .. mapFile)
+            
+    -- create a start point if the level file does not
+    -- define one.
+    if (map.playerStart == nil or map.playerStart[1] == nil) then
+        map.playerStart = {}
+        map.playerStart[1] = {}
+        map.playerStart[1].x = DEFAULT_PLAYER_START.x
+        map.playerStart[1].y = DEFAULT_PLAYER_START.y
+    end
+    
+    SetPlayer(player, map.playerStart[1].x, map.playerStart[1].y)
+    
+    -- redirect names from tmx to names that make sense for our script.
+    monsters = map.enemy
+    treasures = map.treasure
+    
+    if monsters ~= nil then
+        for i = 1, #monsters do
+            SetMonster(monsters[i], monsters[i].x, monsters[i].y)
+        end
     end
 end
 
 -- core functions
 
 function Start()
-    LoadTmxFile(assetDirectory .. "maps/platformer.tmx")
-    
-    -- This example can handle maps with different tile sizes. For example, comment out the previous LoadTmxFile() call and uncomment this:
-    -- LoadTmxFile(assetDirectory .. "maps/platformer32.tmx")
-    
-    map.walkable = {1, 2} --indices of tiles that the player and other actors can walk through.
-    
-    CreateWindow(map.width * map.tileSize, map.height * map.tileSize)
-    SetWindowTitle("Platformer 2")
-    
-    font = LoadFont("fonts/8_bit_pusab.ttf", 18)      
-    tileImage = LoadImage(map.tileAtlas)
-    player = {}
-    
-    -- create a start point if the level file does not
-    -- define one.
-    if (playerStart == nil or playerStart[1] == nil) then
-        playerStart = {}
-        playerStart[1] = {}
-        playerStart[1].x = DEFAULT_PLAYER_START.x
-        playerStart[1].y = DEFAULT_PLAYER_START.y
-    end
-    
-    SetPlayer(player, playerStart[1].x, playerStart[1].y)
-    
-    -- redirect names from tmx to names that make sense for our script.
-    monsters = enemy
-    treasures = treasure
-    
-    for i = 1, #monsters do
-        SetMonster(monsters[i], monsters[i].x, monsters[i].y)
-        Log("monsters " .. i .. " gravity: " .. monsters[i].gravity)
-    end
+    LoadMap(STARTING_MAP)
 end
 
 function Update()
@@ -329,8 +398,11 @@ function Update()
 
     UpdatePlayerInput()
     UpdateActor(player)
-    UpdateMonsters()
     UpdateTreasures()
+    UpdateMonsters()
+    
+    --always want to do this last in the frame
+    UpdateExits()
 end
 
 function Draw()

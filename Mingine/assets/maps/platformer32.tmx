@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="24" tilewidth="32" tileheight="32" nextobjectid="1">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="24" tilewidth="32" tileheight="32" nextobjectid="3">
  <tileset firstgid="1" name="gb" tilewidth="32" tileheight="32" tilecount="4" columns="4">
   <image source="../images/gbTiles32x32.png" width="128" height="32"/>
  </tileset>
@@ -31,4 +31,12 @@
 4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4
 </data>
  </layer>
+ <objectgroup name="Actors">
+  <object id="1" name="playerStart" x="160" y="640" width="32" height="32"/>
+  <object id="2" name="exit" x="928" y="704" width="32" height="32">
+   <properties>
+    <property name="map" value="level1"/>
+   </properties>
+  </object>
+ </objectgroup>
 </map>

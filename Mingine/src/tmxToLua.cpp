@@ -39,7 +39,8 @@ namespace mingine {
 		PropertyType_Unknown,
 		PropertyType_Bool,
 		PropertyType_Float,
-		PropertyType_Int
+		PropertyType_Int,
+		PropertyType_String
 	};
 
 	// A Property represents a key-value pair consisting of a name and a value. The value
@@ -64,6 +65,7 @@ namespace mingine {
 			bool b;
 			float f;
 			int i;
+			const char* s;
 		} value;
 
 		Property()
@@ -92,6 +94,13 @@ namespace mingine {
 			this->propertyType = PropertyType_Int;
 		}
 
+		Property(string name, const char* value)
+		{
+			this->name = name;
+			this->value.s = value;
+			this->propertyType = PropertyType_String;
+		}
+
 		// returns the printable version of the value
 		// of this property.
 		string getValueString() const
@@ -103,12 +112,17 @@ namespace mingine {
 			case PropertyType_Bool:
 				return value.b ? "true" : "false";
 			case PropertyType_Float:
-				return std::to_string(value.f);
+				return to_string(value.f);
 			case PropertyType_Int:
-				return std::to_string(value.i);
+				return to_string(value.i);
+			case PropertyType_String:
+			{
+				string s = string("\"") + string(value.s) + string("\"");
+				return s;
+			}
 			default:
 				log("Unknown property type sent to getValueString()");
-				return std::to_string(value.i);
+				return to_string(value.i);
 			}
 		}
 	};
@@ -219,7 +233,7 @@ namespace mingine {
 
 		for (auto &objectTypes : objects)
 		{
-			objectListScript += objectTypes.first + " = {";
+			objectListScript += string(mapData.outTableName) + "." + objectTypes.first + " = {";
 
 			for (auto& item : objectTypes.second)
 			{
@@ -408,7 +422,11 @@ namespace mingine {
 
 							Property property;
 							
-							if (strcmp(type, "bool") == 0)
+							if (type == nullptr)
+							{
+								property = Property(name, value);
+							}
+							else if (strcmp(type, "bool") == 0)
 							{
 								property = Property(name, toBool(value));
 							}
