@@ -66,7 +66,11 @@ namespace mingine {
 			float f;
 			int i;
 			const char* s;
-		} value;
+		} value{ nullptr };
+
+		// these constructors exploit function overload lookup
+		// to make it easy to create properties from arbitrary
+		// values of various types.
 
 		Property()
 		{
@@ -127,6 +131,8 @@ namespace mingine {
 		}
 	};
 
+	// checks the results of various operations using tinyXml and 
+	// displays an error box is there was an issue reading an xml file.
 	void XMLCheckResult(int result)
 	{
 		if (result != XML_SUCCESS)
@@ -137,6 +143,7 @@ namespace mingine {
 		}
 	}
 
+	// converts a string to a bool
 	bool toBool(const char* boolString)
 	{
 		if (strcmp(boolString, "true") == 0)
@@ -154,6 +161,7 @@ namespace mingine {
 		}
 	}
 
+	// converts a string to a float
 	float toFloat(const char* floatString)
 	{
 		stringstream strValue;
@@ -165,6 +173,7 @@ namespace mingine {
 		return value;
 	}
 
+	// converts a string to an int
 	int toInt(const char* intString)
 	{
 		stringstream strValue;
@@ -176,16 +185,19 @@ namespace mingine {
 		return value;
 	}
 	
+	// reads an xml attribute from an xml element and converts it to an int.
 	int readIntAttribute(XMLElement* element, const char* intName)
 	{
 		return toInt(element->Attribute(intName));
 	}
-		
+	
+	// helper function for generating a lua script to add a string value to a table.
 	void writeStringField(const char* outTableName, const char* valueName, const char* value, string& outString)
 	{
 		outString += string(outTableName) + "." + valueName + " = \"" + value + "\"\n";
 	}
 
+	// helper function for generating a lua script to add an int value to a table.
 	void writeIntField(const char* outTableName, const char* valueName, int value, string& outString)
 	{
 		outString += string(outTableName) + "." + valueName + " = " + to_string(value) + "\n";
