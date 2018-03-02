@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
+#include <map>
 #include <vector>
 #include <assert.h>
 using namespace std;
@@ -29,6 +30,54 @@ namespace mingine {
 		int mapLength() const { return width * height; }
 	};
 
+	enum PropertyType
+	{
+		PropertyType_Unknown,
+		PropertyType_Bool,
+		PropertyType_Float,
+		PropertyType_Int
+	};
+
+	class Property
+	{
+	public:
+		string name;
+		PropertyType propertyType{ PropertyType_Unknown };
+
+		union
+		{
+			bool b;
+			float f;
+			int i;
+		} value;
+
+		Property()
+		{
+			// nothing
+		}
+
+		Property(string name, bool value)
+		{
+			this->name = name;
+			this->value.b = value;
+			this->propertyType = PropertyType_Bool;
+		}
+
+		Property(string name, float value)
+		{
+			this->name = name;
+			this->value.f = value;
+			this->propertyType = PropertyType_Float;
+		}
+
+		Property(string name, int value)
+		{
+			this->name = name;
+			this->value.i = value;
+			this->propertyType = PropertyType_Int;
+		}
+	};
+
 	void XMLCheckResult(int result)
 	{
 		if (result != XML_SUCCESS)
@@ -39,11 +88,38 @@ namespace mingine {
 		}
 	}
 
-	int readIntAttribute(XMLElement* element, const char* intName)
+	bool toBool(const char* boolString)
 	{
-		const char * szAttributeText = element->Attribute(intName);
+		if (strcmp(boolString, "true") == 0)
+		{
+			return true;
+		}
+		else if (strcmp(boolString, "false") == 0)
+		{
+			return false;
+		}
+		else
+		{
+			log("Error parsing bool value in tmx file.");
+			return false;
+		}
+	}
+
+	float toFloat(const char* floatString)
+	{
 		stringstream strValue;
-		strValue << szAttributeText;
+		strValue << floatString;
+
+		float value;
+		strValue >> value;
+
+		return value;
+	}
+
+	int toInt(const char* intString)
+	{
+		stringstream strValue;
+		strValue << intString;
 
 		int value;
 		strValue >> value;
@@ -51,6 +127,12 @@ namespace mingine {
 		return value;
 	}
 
+
+	int readIntAttribute(XMLElement* element, const char* intName)
+	{
+		return toInt(element->Attribute(intName));
+	}
+		
 	void writeStringField(const char* outTableName, const char* valueName, const char* value, string& outString)
 	{
 		outString += string(outTableName) + "." + valueName + " = \"" + value + "\"\n";
@@ -61,7 +143,7 @@ namespace mingine {
 		outString += string(outTableName) + "." + valueName + " = " + to_string(value) + "\n";
 	}
 
-	void writeLuaMapScript(const MapData& mapData, string& outScript)
+	void writeLuaMapScript(const MapData& mapData, const map<string, vector<vector<Property>>>& objects, string& outScript)
 	{
 		outScript = outScript.append(mapData.outTableName).append(" = {}\n");
 		writeStringField(mapData.outTableName, "tileAtlas", mapData.tileSetPath, outScript);
@@ -97,6 +179,20 @@ namespace mingine {
 			// erase last comma
 			outScript.resize(outScript.size() - 1);
 			outScript += "}\n"; // end of walkability grid
+		}
+
+		for (auto &objectTypes : objects)
+		{
+			outScript += objectTypes.first + " = {}\n";
+
+			for (auto& item : objectTypes.second)
+			{
+				//outScript += "{}, ";
+			}
+
+			// erase last comma
+			//outScript.resize(outScript.size() - 1);
+			//outScript += "}\n";
 		}
 	}
 
@@ -148,7 +244,7 @@ namespace mingine {
 		// parse layers
 		XMLElement* pLayerElement = pMapElement->FirstChildElement("layer");
 		if (pLayerElement == nullptr) return XML_ERROR_PARSING_ELEMENT;
-
+				
 		while (pLayerElement != nullptr)
 		{
 			const char * name = pLayerElement->Attribute("name");
@@ -188,6 +284,8 @@ namespace mingine {
 
 		// parse object groups
 		XMLElement* pObjectGroupElement = pMapElement->FirstChildElement("objectgroup");
+
+		map<string, vector<vector<Property>>> objects;
 
 		while (pObjectGroupElement != nullptr)
 		{
@@ -234,13 +332,73 @@ namespace mingine {
 					pListElement = pListElement->NextSiblingElement("object");
 				}
 			}
+			else
+			{
+				XMLElement* pListElement = pObjectGroupElement->FirstChildElement("object");
+
+				while (pListElement != nullptr)
+				{
+					const char* objectName = pListElement->Attribute("name");
+
+					if (objects.find(objectName) == objects.end())
+					{
+						objects[objectName] = vector<vector<Property>>();
+					}
+
+					int x = readIntAttribute(pListElement, "x") / mapData.tileSize;
+					int y = readIntAttribute(pListElement, "y") / mapData.tileSize;
+					
+					XMLElement* pPropertiesElement = pListElement->FirstChildElement("properties");
+
+					if (pPropertiesElement != nullptr)
+					{
+						vector<Property> properties;
+						
+						XMLElement* pPropertyElement = pPropertiesElement->FirstChildElement("property");
+
+						while (pPropertyElement != nullptr)
+						{
+							const char* name = pPropertyElement->Attribute("name");
+							const char* type = pPropertyElement->Attribute("type");
+							const char* value = pPropertyElement->Attribute("value");
+
+							Property property;
+							
+							if (strcmp(type, "bool") == 0)
+							{
+								property = Property(name, toBool(value));
+							}
+							else if (strcmp(type, "float") == 0)
+							{
+								property = Property(name, toFloat(value));
+							}
+							else if (strcmp(type, "int") == 0)
+							{
+								property = Property(name, toInt(value));
+							}
+							else
+							{
+								log("error parsing object properties in tmx file.");
+							}
+
+							properties.push_back(property);
+
+							pPropertyElement = pPropertyElement->NextSiblingElement("property");
+						}
+
+						objects[objectName].push_back(properties);
+					}
+					
+					pListElement = pListElement->NextSiblingElement("object");
+				}
+			}
 
 			pObjectGroupElement = pObjectGroupElement->NextSiblingElement("objectgroup");
 		}
 
 		// write file
 		log("Encoding tmx as lua script...");
-		writeLuaMapScript(mapData, outScript);
+		writeLuaMapScript(mapData, objects, outScript);
 
 		return XML_SUCCESS;
 	}

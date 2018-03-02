@@ -37,7 +37,6 @@ function SetActor(actor, x, y)
     actor.maxVelocityY = MAX_SPEED.y
     actor.jumpImpulse =  JUMP_IMPULSE
     actor.monster = false
-    actor.defeated = false
 end
 
 function UpdatePlayerInput()
