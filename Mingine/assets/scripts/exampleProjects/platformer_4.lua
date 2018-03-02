@@ -270,7 +270,7 @@ function UpdateMonsters()
 end
 
 function DrawExits()
-    SetDrawColor(24, 255, 24, 255)
+    SetDrawColor(15, 163, 172, 255)
     
     for i = 1, #map.exit do
         FillRect(map.exit[i].x * map.tileSize, map.exit[i].y * map.tileSize,  map.tileSize, map.tileSize)
