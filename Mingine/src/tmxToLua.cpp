@@ -66,7 +66,7 @@ namespace mingine {
 			float f;
 			int i;
 			const char* s;
-		} value{ nullptr };
+		} value{};
 
 		// these constructors exploit function overload lookup
 		// to make it easy to create properties from arbitrary
