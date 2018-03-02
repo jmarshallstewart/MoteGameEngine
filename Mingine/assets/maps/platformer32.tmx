@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="right-down" width="32" height="24" tilewidth="32" tileheight="32" nextobjectid="3">
+ <properties>
+  <property name="music" value="ending"/>
+ </properties>
  <tileset firstgid="1" name="gb" tilewidth="32" tileheight="32" tilecount="4" columns="4">
   <image source="../images/gbTiles32x32.png" width="128" height="32"/>
  </tileset>

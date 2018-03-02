@@ -191,7 +191,51 @@ namespace mingine {
 		outString += string(outTableName) + "." + valueName + " = " + to_string(value) + "\n";
 	}
 
-	void writeLuaMapScript(const MapData& mapData, const map<string, vector<vector<Property>>>& objects, string& outScript)
+	void ReadProperties(XMLElement* pElement, vector<Property>& properties)
+	{
+		XMLElement* pPropertiesElement = pElement->FirstChildElement("properties");
+
+		if (pPropertiesElement != nullptr)
+		{
+			XMLElement* pPropertyElement = pPropertiesElement->FirstChildElement("property");
+
+			while (pPropertyElement != nullptr)
+			{
+				const char* name = pPropertyElement->Attribute("name");
+				const char* type = pPropertyElement->Attribute("type");
+				const char* value = pPropertyElement->Attribute("value");
+
+				Property property;
+
+				if (type == nullptr)
+				{
+					property = Property(name, value);
+				}
+				else if (strcmp(type, "bool") == 0)
+				{
+					property = Property(name, toBool(value));
+				}
+				else if (strcmp(type, "float") == 0)
+				{
+					property = Property(name, toFloat(value));
+				}
+				else if (strcmp(type, "int") == 0)
+				{
+					property = Property(name, toInt(value));
+				}
+				else
+				{
+					log("error parsing object properties in tmx file.");
+				}
+
+				properties.push_back(property);
+
+				pPropertyElement = pPropertyElement->NextSiblingElement("property");
+			}
+		}
+	}
+
+	void writeLuaMapScript(const MapData& mapData, const vector<Property>& mapProperties, const map<string, vector<vector<Property>>>& objects, string& outScript)
 	{
 		outScript = outScript.append(mapData.outTableName).append(" = {}\n");
 		writeStringField(mapData.outTableName, "tileAtlas", mapData.tileSetPath, outScript);
@@ -251,6 +295,12 @@ namespace mingine {
 		}
 
 		outScript += objectListScript;
+
+		for (size_t i = 0; i < mapProperties.size(); ++i)
+		{
+			const Property& p = mapProperties[i];
+			outScript += string(mapData.outTableName) + "." + p.name + " = " + p.getValueString() + "\n";
+		}
 	}
 
 	int parseTmx(const char* tmxFile, const char* topPathToMatch, const char* outTableName, string& outScript)
@@ -264,6 +314,9 @@ namespace mingine {
 
 		XMLElement* pMapElement = xmlDoc.RootElement();
 		if (pMapElement == nullptr) return XML_ERROR_FILE_READ_ERROR;
+
+		vector<Property> mapProperties;
+		ReadProperties(pMapElement, mapProperties);
 
 		// parse tilesets
 		XMLElement* pTilesetElement = pMapElement->FirstChildElement("tileset");
@@ -408,46 +461,7 @@ namespace mingine {
 					properties.push_back(Property("x", readIntAttribute(pListElement, "x") / mapData.tileSize));
 					properties.push_back(Property("y", readIntAttribute(pListElement, "y") / mapData.tileSize));
 										
-					XMLElement* pPropertiesElement = pListElement->FirstChildElement("properties");
-
-					if (pPropertiesElement != nullptr)
-					{
-						XMLElement* pPropertyElement = pPropertiesElement->FirstChildElement("property");
-
-						while (pPropertyElement != nullptr)
-						{
-							const char* name = pPropertyElement->Attribute("name");
-							const char* type = pPropertyElement->Attribute("type");
-							const char* value = pPropertyElement->Attribute("value");
-
-							Property property;
-							
-							if (type == nullptr)
-							{
-								property = Property(name, value);
-							}
-							else if (strcmp(type, "bool") == 0)
-							{
-								property = Property(name, toBool(value));
-							}
-							else if (strcmp(type, "float") == 0)
-							{
-								property = Property(name, toFloat(value));
-							}
-							else if (strcmp(type, "int") == 0)
-							{
-								property = Property(name, toInt(value));
-							}
-							else
-							{
-								log("error parsing object properties in tmx file.");
-							}
-
-							properties.push_back(property);
-
-							pPropertyElement = pPropertyElement->NextSiblingElement("property");
-						}
-					}
+					ReadProperties(pListElement, properties);
 
 					objects[objectName].push_back(properties);
 					
@@ -460,7 +474,7 @@ namespace mingine {
 
 		// write file
 		log("Encoding tmx as lua script...");
-		writeLuaMapScript(mapData, objects, outScript);
+		writeLuaMapScript(mapData, mapProperties, objects, outScript);
 		
 		return XML_SUCCESS;
 	}

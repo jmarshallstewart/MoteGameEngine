@@ -377,6 +377,13 @@ int PlayMusic(lua_State* state)
     return 0;
 }
 
+int StopMusic(lua_State* state)
+{
+	stopMusic();
+	return 0;
+}
+
+
 int IsKeyDown(lua_State* state)
 {
     int scancode = (int)lua_tointeger(state, 1);
@@ -527,6 +534,7 @@ int main(int argc, char* argv[])
 	lua_register(luaState, "FillRect", FillRect);
     lua_register(luaState, "PlaySound", PlaySound);
     lua_register(luaState, "PlayMusic", PlayMusic);
+	lua_register(luaState, "StopMusic", StopMusic);
     lua_register(luaState, "IsKeyDown", IsKeyDown);
 	lua_register(luaState, "IsKeyReleased", IsKeyReleased);
 	lua_register(luaState, "IsKeyPressed", IsKeyPressed);

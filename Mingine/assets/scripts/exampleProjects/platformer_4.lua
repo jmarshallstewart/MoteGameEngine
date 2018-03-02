@@ -380,6 +380,12 @@ function LoadMap(mapFile)
         windowCreated = true
     end
     
+    StopMusic()
+    if map.music ~= nil then
+        local music = LoadMusic("music/" .. map.music .. ".ogg")
+        PlayMusic(music)
+    end
+    
     tileImage = LoadImage(map.tileAtlas)
     SetWindowTitle("platformer 4: " .. mapFile)
             
@@ -409,9 +415,6 @@ end
 
 function Start()
     LoadMap(STARTING_MAP)
-    
-    local music = LoadMusic("music/title.ogg")
-    PlayMusic(music)
 end
 
 function Update()
