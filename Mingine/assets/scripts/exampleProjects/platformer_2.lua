@@ -1,7 +1,8 @@
 -- This projects ports the excellent tutorial found here to mingine:
 -- https://codeincomplete.com/posts/tiny-platformer/
 --
--- This example project is current WIP.
+-- This example extends the previous platformer project to include
+-- pickups and enemies.
 --
 
 --tuning parameters for player input
