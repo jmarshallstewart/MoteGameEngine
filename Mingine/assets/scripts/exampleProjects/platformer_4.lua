@@ -259,7 +259,7 @@ function UpdateMonsters()
             local removed = false
         
             if BoxesOverlapWH(monsters[i].x, monsters[i].y, 1, 1, player.x, player.y, 1, 1) then
-                if (player.velocity.y > 0) and (monsters[i].y - player.y > 0.5) then
+                if (player.velocity.y > 0) and (monsters[i].y - player.y > 0.4) == true then
                     table.remove(monsters, i)
                     player.enemyDefeats = player.enemyDefeats + 1
                     removed = true
@@ -451,4 +451,5 @@ function Draw()
     DrawMonsters()
     DrawPlayer()
     DrawText("E: " .. player.enemyDefeats .. "  T: " .. player.treasures .. "  D: " .. player.defeats, 8, 9, font, 255, 255, 255)
+    DrawText("X: " .. player.x .. "  y: " .. player.y, 8, 36, font, 255, 255, 255)
 end

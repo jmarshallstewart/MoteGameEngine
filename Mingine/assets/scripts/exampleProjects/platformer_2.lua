@@ -224,7 +224,7 @@ function UpdateMonsters()
         local removed = false
     
         if BoxesOverlapWH(monsters[i].x, monsters[i].y, 1, 1, player.x, player.y, 1, 1) then
-            if (player.velocity.y > 0) and (monsters[i].y - player.y > 0.5) then
+            if (player.velocity.y > 0) and (monsters[i].y - player.y > 0.4) then
                 table.remove(monsters, i)
                 player.enemyDefeats = player.enemyDefeats + 1
                 removed = true
