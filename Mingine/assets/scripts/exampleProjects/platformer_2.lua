@@ -1,19 +1,8 @@
 -- This projects ports the excellent tutorial found here to mingine:
---
 -- https://codeincomplete.com/posts/tiny-platformer/
 --
--- This tutorial is well worth reading. Though it is written in ActionScript,
--- the concepts are portable to any development environment used for making games.
+-- This example project is current WIP.
 --
--- This project loads a tmx file, but only uses the first layer.
---
--- This project does not rely on the mingine entity system, and instead it
--- implements a separate physics sim more amenable to platforming gameplay.
---
--- The player keeps a redundant copy of tuning constants so that UpdateActor()
--- can be written in anticipation of adding different types of actors later that
--- may have different tuning values so that they behave differently from the player.
-
 
 --tuning parameters for player input
 
@@ -25,7 +14,6 @@ JUMP_IMPULSE = 25
 FALLING_FRICTION_SCALE = 0.5
 FALLING_ACCELERATION_SCALE = 0.5
 SETTLE_TOLERANCE = 0.11 -- higher number indicates max penetration for player to snap to grid when coming to a stop.
-
 
 -- helper functions
 
@@ -49,6 +37,7 @@ function SetActor(actor, x, y)
     actor.maxVelocityY = MAX_SPEED.y
     actor.jumpImpulse =  JUMP_IMPULSE
     actor.monster = false
+    actor.defeated = false
 end
 
 function UpdatePlayerInput()
@@ -150,7 +139,7 @@ function UpdateActor(actor)
         actor.x = math.floor(actor.x)
     end
     
-    -- bounce monster if it as a platform edge.
+    -- bounce monster if it is at a platform edge.
     if actor.monster then
         if actor.left and (cell or not cellDown) then
             actor.left = false
@@ -162,9 +151,28 @@ function UpdateActor(actor)
     end
 end
 
+function UpdateTreasures()
+    for i = #treasures, 1, -1 do
+        if BoxesOverlapWH(treasures[i].x, treasures[i].y, 1, 1, player.x, player.y, 1, 1) then
+            treasures.remove(i)
+        end
+    end
+end
+
 function UpdateMonsters()
-    for i = 1, #monsters do
+    for i = #monsters, 1, -1 do
         UpdateActor(monsters[i])
+        
+        if BoxesOverlapWH(monsters[i].x, monsters[i].y, 1, 1, player.x, player.y, 1, 1) then
+            if (player.velocity.y > 0) and (monsters[i].y - player.y > 0.5) then
+                monsters.remove(i)
+            else
+                player.x = playerStartX
+                player.y = playerStartY
+                player.velocity.x = 0
+                player.velocity.y = 0
+            end
+        end
     end
 end
 
@@ -182,6 +190,22 @@ function DrawPlayer()
     FillRect(player.x * map.tileSize, player.y * map.tileSize, map.tileSize, map.tileSize)
 end
 
+function DrawMonsters()
+    SetDrawColor(24, 24, 24, 255)
+    
+    for i = 1, #monsters do
+        FillRect(monsters[i].x * map.tileSize, monsters[i].y * map.tileSize,  map.tileSize, map.tileSize)
+    end
+end
+
+function DrawTreasures()
+    SetDrawColor(243, 246, 19, 255)
+    
+    for i = 1, #treasures do
+        FillRect(treasures[i].x * map.tileSize, treasures[i].y * map.tileSize,  map.tileSize, map.tileSize)
+    end
+end
+
 -- core functions
 
 function Start()
@@ -196,9 +220,12 @@ function Start()
     CreateWindow(map.width * map.tileSize, map.height * map.tileSize)
     SetWindowTitle("Platformer")
     
+    playerStartX = 10
+    playerStartY = 22
+    
     tileImage = LoadImage(map.tileAtlas)
     player = {}
-    SetActor(player, 10, 22)
+    SetActor(player, playerStartX, playerStartY)
     
     monsters = {}
     treasures = {}
@@ -207,11 +234,13 @@ end
 function Update()
     UpdatePlayerInput()
     UpdateActor(player)
-    
     UpdateMonsters()
+    UpdateTreasures()
 end
 
 function Draw()
     DrawWorld()
+    DrawTreasures()
+    DrawMonsters()
     DrawPlayer()
 end
