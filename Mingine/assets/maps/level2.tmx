@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" nextobjectid="22">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" nextobjectid="24">
  <properties>
   <property name="music" value="level2"/>
  </properties>
@@ -63,7 +63,7 @@
    <property name="map" value="platformer32"/>
   </properties>
   <object id="1" name="playerStart" x="32" y="720" width="16" height="16"/>
-  <object id="2" name="enemy" x="80" y="32" width="16" height="16">
+  <object id="2" name="enemy" x="112" y="272" width="16" height="16">
    <properties>
     <property name="gravity" type="float" value="1.2"/>
     <property name="maxSpeedX" type="float" value="1"/>
@@ -81,5 +81,17 @@
   <object id="19" name="treasure" x="528" y="64" width="16" height="16"/>
   <object id="20" name="treasure" x="864" y="64" width="16" height="16"/>
   <object id="21" name="treasure" x="992" y="528" width="16" height="16"/>
+  <object id="22" name="enemy" x="688" y="688" width="16" height="16">
+   <properties>
+    <property name="gravity" type="float" value="1.2"/>
+    <property name="maxSpeedX" type="float" value="1"/>
+   </properties>
+  </object>
+  <object id="23" name="enemy" x="432" y="64" width="16" height="16">
+   <properties>
+    <property name="gravity" type="float" value="1.2"/>
+    <property name="maxSpeedX" type="float" value="1"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>
