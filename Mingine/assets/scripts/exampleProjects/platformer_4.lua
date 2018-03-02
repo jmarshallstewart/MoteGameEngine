@@ -370,10 +370,6 @@ function LoadMap(mapFile)
     map = nil
     
     LoadTmxFile(assetDirectory .. "maps/" .. mapFile .. ".tmx")
-    
-    -- This example can handle maps with different tile sizes. For example, comment out the previous LoadTmxFile() call and uncomment this:
-    -- LoadTmxFile(assetDirectory .. "maps/platformer32.tmx")
-        
     map.walkable = {1, 2} --indices of tiles that the player and other actors can walk through.
     
     RefreshPlayer()
@@ -382,7 +378,6 @@ function LoadMap(mapFile)
     -- all maps will need to use this resolution unless
     -- mingine is extended to resize.
     if not windowCreated then
-                
         CreateWindow(map.width * map.tileSize, map.height * map.tileSize)
         
         font = LoadFont("fonts/8_bit_pusab.ttf", 18)  
@@ -453,5 +448,5 @@ function Draw()
     DrawTreasures()
     DrawMonsters()
     DrawPlayer()
-    DrawText("E: " .. player.enemyDefeats .. "  T: " .. player.treasures .. "  D: " .. player.defeats, 8, 9, font, 255, 255, 255, 128)
+    DrawText("E: " .. player.enemyDefeats .. "  T: " .. player.treasures .. "  D: " .. player.defeats, 8, 9, font, 255, 255, 255)
 end

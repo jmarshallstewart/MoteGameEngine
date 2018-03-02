@@ -338,5 +338,5 @@ function Draw()
     DrawTreasures()
     DrawMonsters()
     DrawPlayer()
-    DrawText("E: " .. player.enemyDefeats .. "  T: " .. player.treasures .. "  D: " .. player.defeats, 8, 9, font, 255, 255, 255, 128)
+    DrawText("E: " .. player.enemyDefeats .. "  T: " .. player.treasures .. "  D: " .. player.defeats, 8, 9, font, 255, 255, 255)
 end
