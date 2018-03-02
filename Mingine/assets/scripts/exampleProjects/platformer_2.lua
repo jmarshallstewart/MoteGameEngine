@@ -15,6 +15,8 @@ FALLING_FRICTION_SCALE = 0.5
 FALLING_ACCELERATION_SCALE = 0.5
 SETTLE_TOLERANCE = 0.11 -- higher number indicates max penetration for player to snap to grid when coming to a stop.
 
+DEFAULT_PLAYER_START = {x = 10, y = 22}
+
 -- helper functions
 
 function getCell(x, y)
@@ -182,7 +184,7 @@ end
 function UpdateTreasures()
     for i = #treasures, 1, -1 do
         if BoxesOverlapWH(treasures[i].x, treasures[i].y, 1, 1, player.x, player.y, 1, 1) then
-            treasures.remove(i)
+            table.remove(treasures, i)
         end
     end
 end
@@ -195,8 +197,8 @@ function UpdateMonsters()
             if (player.velocity.y > 0) and (monsters[i].y - player.y > 0.5) then
                 table.remove(monsters, i)
             else
-                player.x = playerStartX
-                player.y = playerStartY
+                player.x = playerStart[1].x
+                player.y = playerStart[1].y
                 player.velocity.x = 0
                 player.velocity.y = 0
             end
@@ -247,14 +249,22 @@ function Start()
     map.tileSize = map.tileSize
     CreateWindow(map.width * map.tileSize, map.height * map.tileSize)
     SetWindowTitle("Platformer")
-    
-    playerStartX = 10
-    playerStartY = 22
-    
+        
     tileImage = LoadImage(map.tileAtlas)
     player = {}
-    SetActor(player, playerStartX, playerStartY)
     
+    -- create a start point if the level file does not
+    -- define one.
+    if (playerStart == nil or playerStart[1] == nil) then
+        playerStart = {}
+        playerStart[1] = {}
+        playerStart[1].x = DEFAULT_PLAYER_START.x
+        playerStart[1].y = DEFAULT_PLAYER_START.y
+    end
+    
+    SetActor(player, playerStart[1].x, playerStart[1].y)
+    
+    -- redirect names from tmx to names that make sense for our script.
     monsters = enemy
     treasures = treasure
     

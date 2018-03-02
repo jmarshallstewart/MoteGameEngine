@@ -13,8 +13,11 @@ using namespace tinyxml2;
 
 namespace mingine {
 
+	// A region of memory set aside as a scratchad for building debug strings.
 	extern char stringBuilderBuffer[MAX_STRING];
 
+	// MapData is just a container to store data
+	// about a map loaded from a tmx file.
 	class MapData
 	{
 	public:
@@ -30,6 +33,7 @@ namespace mingine {
 		int mapLength() const { return width * height; }
 	};
 
+	// Properties can store different types of values, see below.
 	enum PropertyType
 	{
 		PropertyType_Unknown,
@@ -38,12 +42,23 @@ namespace mingine {
 		PropertyType_Int
 	};
 
+	// A Property represents a key-value pair consisting of a name and a value. The value
+	// can be a bool, float, or int. This class is used as an intermediate format
+	// when converting from tmx objects to lua script.
 	class Property
 	{
 	public:
+		// each property has a name such as "maxSpeedX" or "startingHitPoints"
 		string name;
+
+		// without knowing what type of value the property represents,
+		// we will not be able to interpret the value union (see below)
+		// correctly.
 		PropertyType propertyType{ PropertyType_Unknown };
 
+		// properties can store different types of values, but we
+		// use the same memory for that value (which will be the size of
+		// the largest type in the union).
 		union
 		{
 			bool b;
@@ -77,6 +92,8 @@ namespace mingine {
 			this->propertyType = PropertyType_Int;
 		}
 
+		// returns the printable version of the value
+		// of this property.
 		string getValueString() const
 		{
 			switch (propertyType)
@@ -144,8 +161,7 @@ namespace mingine {
 
 		return value;
 	}
-
-
+	
 	int readIntAttribute(XMLElement* element, const char* intName)
 	{
 		return toInt(element->Attribute(intName));
@@ -216,9 +232,7 @@ namespace mingine {
 
 				objectListScript += "}, ";
 			}
-			
-			// erase last comma
-			//outScript.resize(outScript.size() - 1);
+	
 			objectListScript += "}\n";
 		}
 
@@ -374,13 +388,12 @@ namespace mingine {
 						objects[objectName] = vector<vector<Property>>();
 					}
 
-					// store object coordinates
 					vector<Property> properties;
 
+					// store object coordinates
 					properties.push_back(Property("x", readIntAttribute(pListElement, "x") / mapData.tileSize));
 					properties.push_back(Property("y", readIntAttribute(pListElement, "y") / mapData.tileSize));
-
-					
+										
 					XMLElement* pPropertiesElement = pListElement->FirstChildElement("properties");
 
 					if (pPropertiesElement != nullptr)
@@ -416,9 +429,9 @@ namespace mingine {
 
 							pPropertyElement = pPropertyElement->NextSiblingElement("property");
 						}
-
-						objects[objectName].push_back(properties);
 					}
+
+					objects[objectName].push_back(properties);
 					
 					pListElement = pListElement->NextSiblingElement("object");
 				}
