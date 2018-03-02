@@ -18,7 +18,11 @@ SETTLE_TOLERANCE = 0.11 -- higher number indicates max penetration for player to
 
 DEFAULT_PLAYER_START = {x = 10, y = 22}
 
+-- counts the number of times Update() has been called. Used only for animating the alpha on the treasures.
 frame = 0
+
+-- scales the default abilities of monsters.
+monsterScale = 0.3
 
 -- helper functions
 
@@ -34,12 +38,13 @@ function SetPlayer(actor, x, y)
     actor.jump = false
     actor.jumping = false
     actor.falling = false
+    actor.gravity = 1.0
     actor.velocity = { x = 0, y = 0 }
     actor.acceleration = { x = 0, y = 0 }
     actor.friction = FRICTION
     actor.linearAcceleration = LINEAR_ACCELERATION
     actor.maxSpeedX = MAX_SPEED.x
-    actor.maxVelocityY = MAX_SPEED.y
+    actor.maxSpeedY = MAX_SPEED.y
     actor.jumpImpulse =  JUMP_IMPULSE
     actor.monster = false
     actor.enemyDefeats = 0
@@ -56,6 +61,10 @@ function SetMonster(actor, x, y)
     actor.falling = false
     actor.velocity = { x = 0, y = 0 }
     actor.acceleration = { x = 0, y = 0 }
+            
+    -- if actor object already has a property
+    -- read from the tmx file, it is already set.
+    -- if it is nil, set it to a sensible default.
     
     if actor.left == nil then
         actor.left = true
@@ -66,14 +75,28 @@ function SetMonster(actor, x, y)
     end
     
     if actor.maxSpeedX == nil then
-        actor.maxSpeedX = MAX_SPEED.x / 3
+        actor.maxSpeedX = MAX_SPEED.x * monsterScale
     end
     
-    actor.friction = FRICTION
-    actor.linearAcceleration = LINEAR_ACCELERATION / 3
-    actor.maxVelocityY = MAX_SPEED.y / 3
-    actor.jumpImpulse =  JUMP_IMPULSE / 3
+    if actor.maxSpeedY == nil then
+        actor.maxSpeedY = MAX_SPEED.y * monsterScale
+    end
     
+    if actor.gravity == nil then
+        actor.gravity = 1
+    end
+    
+    if actor.friction == nil then
+        actor.friction = FRICTION
+    end
+    
+    if actor.linearAcceleration == nil then
+        actor.linearAcceleration = LINEAR_ACCELERATION * monsterScale
+    end
+    
+    if actor.jumpImpulse == nil then
+        actor.jumpImpulse =  JUMP_IMPULSE * monsterScale
+    end
 end
 
 function UpdatePlayerInput()
@@ -95,7 +118,7 @@ function UpdateActor(actor)
     local acceleration = actor.linearAcceleration * Pick(falling, FALLING_ACCELERATION_SCALE, 1.0)
     
     actor.acceleration.x = 0
-    actor.acceleration.y = GRAVITY
+    actor.acceleration.y = GRAVITY * actor.gravity
     
     if actor.left then actor.acceleration.x = actor.acceleration.x - acceleration
     elseif wasLeft then actor.acceleration.x = actor.acceleration.x + friction end
@@ -114,7 +137,7 @@ function UpdateActor(actor)
     actor.x = actor.x + actor.velocity.x * dt
     actor.y = actor.y + actor.velocity.y * dt
     actor.velocity.x = Clamp(actor.velocity.x + actor.acceleration.x * dt, -actor.maxSpeedX, actor.maxSpeedX)
-    actor.velocity.y = Clamp(actor.velocity.y + actor.acceleration.y * dt, -actor.maxVelocityY, actor.maxVelocityY)
+    actor.velocity.y = Clamp(actor.velocity.y + actor.acceleration.y * dt, -actor.maxSpeedY, actor.maxSpeedY)
     
     --clamp x velocity to prevent jiggle when changing directions
     if (wasLeft and actor.velocity.x > 0) or (wasRight and actor.velocity.x < 0) then 
@@ -198,12 +221,13 @@ end
 
 function UpdateMonsters()
     for i = #monsters, 1, -1 do
-        UpdateActor(monsters[i])
-        
+        local removed = false
+    
         if BoxesOverlapWH(monsters[i].x, monsters[i].y, 1, 1, player.x, player.y, 1, 1) then
             if (player.velocity.y > 0) and (monsters[i].y - player.y > 0.5) then
                 table.remove(monsters, i)
                 player.enemyDefeats = player.enemyDefeats + 1
+                removed = true
             else
                 player.x = playerStart[1].x
                 player.y = playerStart[1].y
@@ -211,6 +235,10 @@ function UpdateMonsters()
                 player.velocity.y = 0
                 player.defeats = player.defeats + 1
             end
+        end
+        
+        if not removed then
+            UpdateActor(monsters[i])
         end
     end
 end
@@ -304,10 +332,6 @@ function Update()
     UpdateActor(player)
     UpdateMonsters()
     UpdateTreasures()
-    
-    if frame > 60 * 60 then
-        frame = frame - 60 * 60
-    end
 end
 
 function Draw()
