@@ -17,13 +17,15 @@ SETTLE_TOLERANCE = 0.11 -- higher number indicates max penetration for player to
 
 DEFAULT_PLAYER_START = {x = 10, y = 22}
 
+frame = 0
+
 -- helper functions
 
 function getCell(x, y)
     return map.tiles[1][(x + (y * map.width)) + 1] -- +1 because of lua array indexing
 end
 
-function SetActor(actor, x, y)
+function SetPlayer(actor, x, y)
     actor.x = x
     actor.y = y
     actor.left = false
@@ -39,6 +41,9 @@ function SetActor(actor, x, y)
     actor.maxVelocityY = MAX_SPEED.y
     actor.jumpImpulse =  JUMP_IMPULSE
     actor.monster = false
+    actor.enemyDefeats = 0
+    actor.treasures = 0
+    actor.defeats = 0
 end
 
 function SetMonster(actor, x, y)
@@ -185,6 +190,7 @@ function UpdateTreasures()
     for i = #treasures, 1, -1 do
         if BoxesOverlapWH(treasures[i].x, treasures[i].y, 1, 1, player.x, player.y, 1, 1) then
             table.remove(treasures, i)
+            player.treasures = player.treasures + 1
         end
     end
 end
@@ -196,11 +202,13 @@ function UpdateMonsters()
         if BoxesOverlapWH(monsters[i].x, monsters[i].y, 1, 1, player.x, player.y, 1, 1) then
             if (player.velocity.y > 0) and (monsters[i].y - player.y > 0.5) then
                 table.remove(monsters, i)
+                player.enemyDefeats = player.enemyDefeats + 1
             else
                 player.x = playerStart[1].x
                 player.y = playerStart[1].y
                 player.velocity.x = 0
                 player.velocity.y = 0
+                player.defeats = player.defeats + 1
             end
         end
     end
@@ -229,7 +237,20 @@ function DrawMonsters()
 end
 
 function DrawTreasures()
-    SetDrawColor(243, 246, 19, 255)
+    local duration = 60
+    local half = duration / 2
+    local pulse = frame % duration
+    
+    local glow = 0
+    if pulse < half then
+        glow = pulse / half
+    else
+        glow = 1 - (pulse - half) / half;
+    end
+    
+    local alpha = math.floor( glow * 255 )    
+      
+    SetDrawColor(243, 246, 19, alpha)
     
     for i = 1, #treasures do
         FillRect(treasures[i].x * map.tileSize, treasures[i].y * map.tileSize,  map.tileSize, map.tileSize)
@@ -249,7 +270,8 @@ function Start()
     map.tileSize = map.tileSize
     CreateWindow(map.width * map.tileSize, map.height * map.tileSize)
     SetWindowTitle("Platformer")
-        
+    
+    font = LoadFont("fonts/8_bit_pusab.ttf", 18)      
     tileImage = LoadImage(map.tileAtlas)
     player = {}
     
@@ -262,7 +284,7 @@ function Start()
         playerStart[1].y = DEFAULT_PLAYER_START.y
     end
     
-    SetActor(player, playerStart[1].x, playerStart[1].y)
+    SetPlayer(player, playerStart[1].x, playerStart[1].y)
     
     -- redirect names from tmx to names that make sense for our script.
     monsters = enemy
@@ -275,10 +297,16 @@ function Start()
 end
 
 function Update()
+    frame = frame + 1
+
     UpdatePlayerInput()
     UpdateActor(player)
     UpdateMonsters()
     UpdateTreasures()
+    
+    if frame > 60 * 60 then
+        frame = frame - 60 * 60
+    end
 end
 
 function Draw()
@@ -286,4 +314,5 @@ function Draw()
     DrawTreasures()
     DrawMonsters()
     DrawPlayer()
+    DrawText("E: " .. player.enemyDefeats .. "  T: " .. player.treasures .. "  D: " .. player.defeats, 8, 9, font, 255, 255, 255, 128)
 end
