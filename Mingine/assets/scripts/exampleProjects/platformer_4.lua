@@ -25,14 +25,17 @@ frame = 0
 -- scales the default abilities of monsters.
 monsterScale = 0.3
 
+-- only create a window the first time we load a map
 windowCreated = false
 
 -- helper functions
 
+-- returns the tile index for the given x y coordinates (in tile space, where 1 unit = 1 tile)
 function getCell(x, y)
     return map.tiles[1][(x + (y * map.width)) + 1] -- +1 because of lua array indexing
 end
 
+-- initializes player properties for the start of a new map.
 function SetPlayer(actor, x, y)
     actor.x = x
     actor.y = y
@@ -52,6 +55,7 @@ function SetPlayer(actor, x, y)
     actor.monster = false
 end
 
+-- initializes an enemy for the start of a new map.
 function SetMonster(actor, x, y)
     actor.monster = true
     actor.x = x
@@ -99,6 +103,7 @@ function SetMonster(actor, x, y)
     end
 end
 
+-- read input from the player.
 function UpdatePlayerInput()
     player.left = false
     player.right = false
@@ -109,6 +114,7 @@ function UpdatePlayerInput()
     if IsKeyDown(SDL_SCANCODE_SPACE) then player.jump = true end
 end
 
+--updates the physics of actors such as the player and enemies.
 function UpdateActor(actor)
     local wasLeft = actor.velocity.x < 0
     local wasRight = actor.velocity.x > 0
@@ -217,6 +223,7 @@ function UpdateActor(actor)
     end
 end
 
+-- tests whether player is overlapping a treasure. If so, collect the treasure.
 function UpdateTreasures()
     if treasures ~= nil then
         for i = #treasures, 1, -1 do
@@ -229,6 +236,7 @@ function UpdateTreasures()
     end
 end
 
+-- tests whether player is overlapping an exit. If so, loads the next level.
 function UpdateExits()
     if map.exit ~= nil then
         for i = #map.exit, 1, -1 do
@@ -241,6 +249,8 @@ function UpdateExits()
     end
 end
 
+-- tests whether player has defeated monster or a monster
+-- has defeated the player.
 function UpdateMonsters()
     if monsters ~= nil then
         for i = #monsters, 1, -1 do
@@ -269,6 +279,7 @@ function UpdateMonsters()
     end
 end
 
+-- draw exits to the screen.
 function DrawExits()
     SetDrawColor(15, 163, 172, 255)
     
@@ -277,6 +288,7 @@ function DrawExits()
     end
 end
 
+-- draw the tiles from the tmx file.
 function DrawWorld()
     for y = 0, map.height - 1 do
         for x = 0, map.width - 1 do
@@ -284,15 +296,15 @@ function DrawWorld()
             DrawImageFrame(tileImage, x * map.tileSize, y * map.tileSize, map.tileSize, map.tileSize, tileImageIndex - 1, 0, 1)
         end
     end
-    
-    DrawExits()
 end
 
+-- draw player to the screen.
 function DrawPlayer()
     SetDrawColor(255, 255, 255, 255)
     FillRect(player.x * map.tileSize, player.y * map.tileSize, map.tileSize, map.tileSize)
 end
 
+-- draw the enemies to the screen.
 function DrawMonsters()
     if monsters ~= nil then
         SetDrawColor(24, 24, 24, 255)
@@ -303,6 +315,9 @@ function DrawMonsters()
     end
 end
 
+-- draw the treasures to the screen. Ramp their
+-- alpha based on how many frames have elapsed so 
+-- that treasures appear to pulsate.
 function DrawTreasures()
     if treasures ~= nil then
         local duration = 60
@@ -347,6 +362,8 @@ function RefreshPlayer()
     player.defeats = numDefeats
 end
 
+-- start a new level using the specified tmx file.
+-- file name should be passed with no .tmx extension.
 function LoadMap(mapFile)
     monsters = nil
     treasures = nil
@@ -432,6 +449,7 @@ end
 
 function Draw()
     DrawWorld()
+    DrawExits()
     DrawTreasures()
     DrawMonsters()
     DrawPlayer()
