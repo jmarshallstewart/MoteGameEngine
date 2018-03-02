@@ -191,6 +191,11 @@ namespace mingine {
 		outString += string(outTableName) + "." + valueName + " = " + to_string(value) + "\n";
 	}
 
+	// Tiled uses a properties block for custom properties, which both the map
+	// and the objects in the object layers both have. This function populates
+	// the vector properties with the properties in the tmx file. All bool, float,
+	// int, and string properties are supported (all available tmx properties at
+	// the time this was written).
 	void ReadProperties(XMLElement* pElement, vector<Property>& properties)
 	{
 		XMLElement* pPropertiesElement = pElement->FirstChildElement("properties");
