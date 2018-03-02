@@ -2,7 +2,7 @@
 -- https://codeincomplete.com/posts/tiny-platformer/
 --
 -- This example extends the previous platformer project to include
--- sound effects and background music.
+-- sound effects and background music and gamepad input.
 --
 
 --tuning parameters for player input
@@ -109,9 +109,11 @@ function UpdatePlayerInput()
     player.right = false
     player.jump = false
 
-    if IsKeyDown(SDL_SCANCODE_LEFT) then player.left = true end
-    if IsKeyDown(SDL_SCANCODE_RIGHT) then player.right = true end
-    if IsKeyDown(SDL_SCANCODE_SPACE) then player.jump = true end
+    local moveX = GetInputX()
+        
+    if IsKeyDown(SDL_SCANCODE_LEFT) or (moveX < 0) == true then player.left = true end
+    if IsKeyDown(SDL_SCANCODE_RIGHT) or (moveX > 0) == true then player.right = true end
+    if IsKeyDown(SDL_SCANCODE_SPACE)  or (controller_0_button_0 == 1) then player.jump = true end
 end
 
 --updates the physics of actors such as the player and enemies.
