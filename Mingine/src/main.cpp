@@ -383,7 +383,6 @@ int StopMusic(lua_State* state)
 	return 0;
 }
 
-
 int IsKeyDown(lua_State* state)
 {
     int scancode = (int)lua_tointeger(state, 1);
