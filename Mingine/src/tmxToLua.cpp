@@ -112,7 +112,7 @@ namespace mingine {
 			switch (propertyType)
 			{
 			case PropertyType_Unknown:
-				return "unknown";
+				return "\"unknown\"";
 			case PropertyType_Bool:
 				return value.b ? "true" : "false";
 			case PropertyType_Float:
