@@ -33,10 +33,39 @@ function SetActor(actor, x, y)
     actor.acceleration = { x = 0, y = 0 }
     actor.friction = FRICTION
     actor.linearAcceleration = LINEAR_ACCELERATION
-    actor.maxVelocityX = MAX_SPEED.x
+    actor.maxSpeedX = MAX_SPEED.x
     actor.maxVelocityY = MAX_SPEED.y
     actor.jumpImpulse =  JUMP_IMPULSE
     actor.monster = false
+end
+
+function SetMonster(actor, x, y)
+    actor.monster = true
+    actor.x = x
+    actor.y = y
+    actor.jump = false
+    actor.jumping = false
+    actor.falling = false
+    actor.velocity = { x = 0, y = 0 }
+    actor.acceleration = { x = 0, y = 0 }
+    
+    if actor.left == nil then
+        actor.left = true
+    end
+        
+    if actor.right == nil then
+        actor.right = false
+    end
+    
+    if actor.maxSpeedX == nil then
+        actor.maxSpeedX = MAX_SPEED.x / 3
+    end
+    
+    actor.friction = FRICTION
+    actor.linearAcceleration = LINEAR_ACCELERATION / 3
+    actor.maxVelocityY = MAX_SPEED.y / 3
+    actor.jumpImpulse =  JUMP_IMPULSE / 3
+    
 end
 
 function UpdatePlayerInput()
@@ -76,7 +105,7 @@ function UpdateActor(actor)
     
     actor.x = actor.x + actor.velocity.x * dt
     actor.y = actor.y + actor.velocity.y * dt
-    actor.velocity.x = Clamp(actor.velocity.x + actor.acceleration.x * dt, -actor.maxVelocityX, actor.maxVelocityX)
+    actor.velocity.x = Clamp(actor.velocity.x + actor.acceleration.x * dt, -actor.maxSpeedX, actor.maxSpeedX)
     actor.velocity.y = Clamp(actor.velocity.y + actor.acceleration.y * dt, -actor.maxVelocityY, actor.maxVelocityY)
     
     --clamp x velocity to prevent jiggle when changing directions
@@ -164,7 +193,7 @@ function UpdateMonsters()
         
         if BoxesOverlapWH(monsters[i].x, monsters[i].y, 1, 1, player.x, player.y, 1, 1) then
             if (player.velocity.y > 0) and (monsters[i].y - player.y > 0.5) then
-                monsters.remove(i)
+                table.remove(monsters, i)
             else
                 player.x = playerStartX
                 player.y = playerStartY
@@ -226,8 +255,13 @@ function Start()
     player = {}
     SetActor(player, playerStartX, playerStartY)
     
-    monsters = {}
-    treasures = {}
+    monsters = enemy
+    treasures = treasure
+    
+    for i = 1, #monsters do
+        SetMonster(monsters[i], monsters[i].x, monsters[i].y)
+        Log("monsters " .. i .. " gravity: " .. monsters[i].gravity)
+    end
 end
 
 function Update()

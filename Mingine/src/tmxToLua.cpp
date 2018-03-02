@@ -76,6 +76,24 @@ namespace mingine {
 			this->value.i = value;
 			this->propertyType = PropertyType_Int;
 		}
+
+		string getValueString() const
+		{
+			switch (propertyType)
+			{
+			case PropertyType_Unknown:
+				return "unknown";
+			case PropertyType_Bool:
+				return value.b ? "true" : "false";
+			case PropertyType_Float:
+				return std::to_string(value.f);
+			case PropertyType_Int:
+				return std::to_string(value.i);
+			default:
+				log("Unknown property type sent to getValueString()");
+				return std::to_string(value.i);
+			}
+		}
 	};
 
 	void XMLCheckResult(int result)
@@ -181,19 +199,30 @@ namespace mingine {
 			outScript += "}\n"; // end of walkability grid
 		}
 
+		string objectListScript = "";
+
 		for (auto &objectTypes : objects)
 		{
-			outScript += objectTypes.first + " = {}\n";
+			objectListScript += objectTypes.first + " = {";
 
 			for (auto& item : objectTypes.second)
 			{
-				//outScript += "{}, ";
-			}
+				objectListScript += "{";
 
+				for (auto& p : item)
+				{
+					objectListScript += p.name + " = " + p.getValueString() + ", ";
+				}
+
+				objectListScript += "}, ";
+			}
+			
 			// erase last comma
 			//outScript.resize(outScript.size() - 1);
-			//outScript += "}\n";
+			objectListScript += "}\n";
 		}
+
+		outScript += objectListScript;
 	}
 
 	int parseTmx(const char* tmxFile, const char* topPathToMatch, const char* outTableName, string& outScript)
@@ -345,15 +374,17 @@ namespace mingine {
 						objects[objectName] = vector<vector<Property>>();
 					}
 
-					int x = readIntAttribute(pListElement, "x") / mapData.tileSize;
-					int y = readIntAttribute(pListElement, "y") / mapData.tileSize;
+					// store object coordinates
+					vector<Property> properties;
+
+					properties.push_back(Property("x", readIntAttribute(pListElement, "x") / mapData.tileSize));
+					properties.push_back(Property("y", readIntAttribute(pListElement, "y") / mapData.tileSize));
+
 					
 					XMLElement* pPropertiesElement = pListElement->FirstChildElement("properties");
 
 					if (pPropertiesElement != nullptr)
 					{
-						vector<Property> properties;
-						
 						XMLElement* pPropertyElement = pPropertiesElement->FirstChildElement("property");
 
 						while (pPropertyElement != nullptr)
@@ -399,7 +430,7 @@ namespace mingine {
 		// write file
 		log("Encoding tmx as lua script...");
 		writeLuaMapScript(mapData, objects, outScript);
-
+		
 		return XML_SUCCESS;
 	}
 
