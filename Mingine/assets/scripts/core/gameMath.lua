@@ -87,6 +87,10 @@ function IsPointInCircle(x, y, circle)
     return Distance(x, y, circle.x, circle.y) <= circle.radius
 end
 
+function IsPointInCircle(x, y, circleX, circleY, circleRadius)
+    return Distance(x, y, circleX, circleY) <= circleRadius
+end
+
 --function CirclesOverlap(circle1, circle2)
 --    return Distance(circle1.x, circle1.y, circle2.x, circle2.y) <= circle1.radius + circle2.radius
 --end

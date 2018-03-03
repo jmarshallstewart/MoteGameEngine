@@ -2,7 +2,7 @@
 -- https://codeincomplete.com/posts/tiny-platformer/
 --
 -- This example extends the previous platformer project to include
--- sound effects and background music and gamepad input.
+-- sound effects, background music, and gamepad input.
 --
 
 --tuning parameters for player input
