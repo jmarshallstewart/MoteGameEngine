@@ -4,7 +4,6 @@ SCREEN_WIDTH = 1024
 SCREEN_HEIGHT = 768
 
 ARRIVE_DISTANCE = 14
-targetWaypoint = 1
 MAX_ACCELERATION = 1.0 -- how fast can the agent change direction and speed?
 
 --when reading about A*, waypoints and links are nodes and edges.
@@ -24,13 +23,8 @@ function Start()
     local image = LoadImage("images/arrow.png")
     agent = CreateEntity(image, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 32, 16)
     agent.maxSpeed = 8
-    
-    path = {}
-    path[1] = {x = 64, y = 80}
-    path[2] = {x = SCREEN_WIDTH - 64, y = 80}
-    path[3] = {x = SCREEN_WIDTH - 300, y = SCREEN_HEIGHT / 2}
-    path[4] = {x = SCREEN_WIDTH - 64, y = SCREEN_HEIGHT - 64}
-    path[5] = {x = 64, y = SCREEN_HEIGHT - 64}
+    agent.path = {}
+    agent.targetWaypoint = 1
 end
 
 function Update()
@@ -139,21 +133,8 @@ end
 
 function Draw()
     ClearScreen(68, 136, 204)
-            
-    --draw the waypoints (radius = arrive distance)
-    SetDrawColor(33, 0, 255, 255)
-    
-    for i = 1, #waypoints do
-        DrawCircle(waypoints[i].x, waypoints[i].y, ARRIVE_DISTANCE)
-    end
-    
-    --draw path
-    SetDrawColor(255, 0, 255, 255)
-    
-    for i = 1, #path do
-        DrawCircle(path[i].x, path[i].y, ARRIVE_DISTANCE)
-    end
-    
+       
+    -- draw links between waypoints
     SetDrawColor(255, 255, 255, 255)
     for i = 1, #links do
         local startX = waypoints[links[i].start].x
@@ -162,7 +143,19 @@ function Draw()
         local finishY = waypoints[links[i].finish].y
         DrawLine(startX, startY, finishX, finishY)
     end
+           
+    -- draw the waypoints (radius = arrive distance)
+    SetDrawColor(33, 0, 255, 255)
+    for i = 1, #waypoints do
+        DrawCircle(waypoints[i].x, waypoints[i].y, ARRIVE_DISTANCE)
+    end
     
+    -- draw path
+    SetDrawColor(255, 0, 255, 255)
+    for i = 1, #agent.path do
+        DrawCircle(agent.path[i].x, agent.path[i].y, ARRIVE_DISTANCE)
+    end
+            
     -- draw pathfinding agent.
     DrawEntity(agent)
 end
