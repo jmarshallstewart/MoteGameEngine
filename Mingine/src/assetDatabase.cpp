@@ -37,6 +37,8 @@ int AssetDatabase::add(LoadParameters& loadParameters, std::string& errorMessage
 	   
     Asset* asset = nullptr;
 
+	// instantiate a new object based on
+	// the asset type.
     switch (loadParameters.assetType)
     {
         case AssetImage:

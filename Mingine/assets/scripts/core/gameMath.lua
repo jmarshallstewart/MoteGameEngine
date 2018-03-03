@@ -87,6 +87,10 @@ function IsPointInCircle(x, y, circle)
     return Distance(x, y, circle.x, circle.y) <= circle.radius
 end
 
+function IsPointInCircle(x, y, circleX, circleY, circleRadius)
+    return Distance(x, y, circleX, circleY) <= circleRadius
+end
+
 --function CirclesOverlap(circle1, circle2)
 --    return Distance(circle1.x, circle1.y, circle2.x, circle2.y) <= circle1.radius + circle2.radius
 --end
@@ -101,13 +105,17 @@ function IsPointInBox(x, y, box)
     return x >= box.x and x <= box.x + box.w and y >= box.y and y <= box.y + box.h
 end
 
-function BoxesOverlap(box1, box2)
-	if box1.x >= box2.x + box2.w then return false end
-	if box1.y >= box2.y + box2.h then return false end
-	if box2.x >= box1.x + box1.w then return false end
-	if box2.y >= box1.y + box1.h then return false end
+function BoxesOverlapWH(x1, y1, w1, h1, x2, y2, w2, h2)
+	if x1 >= x2 + w2 then return false end
+	if y1 >= y2 + h2 then return false end
+	if x2 >= x1 + w1 then return false end
+	if y2 >= y1 + h1 then return false end
     
     return true
+end
+
+function BoxesOverlap(box1, box2)
+    return BoxesOverlapWH(box1.x, box1.y, box1.w, box1.h, box2.x, box2.y, box2.w, box2.h)
 end
 
 -- CIRCLE-BOX COLLISION
@@ -133,5 +141,11 @@ function CircleBoxOverlap(circle, box)
     end
     
     return Distance(closestX, closestY, circle.x, circle.y) < circle.radius;
+end
+
+-- MISC
+
+function Clamp(value, min, max)
+    return math.min(math.max(value, min), max)
 end
 

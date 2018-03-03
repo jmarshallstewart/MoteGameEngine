@@ -68,6 +68,7 @@ void Image::draw(int x, int y, double angle, double scale, uint8_t r, uint8_t g,
 	SDL_RenderCopyEx(renderer, (SDL_Texture*)assetData, nullptr, &destRect, angle, nullptr, SDL_FLIP_NONE);
 }
 
+// draw a specific frame a texture atlas, an image that contains multiple frames of animation.
 void Image::drawFrame(int x, int y, int frameWidth, int frameHeight, int frame, double angle, double scale, uint8_t r, uint8_t g, uint8_t b)
 {
 	SDL_Rect destRect;
@@ -109,7 +110,7 @@ void Font::draw(const char* text, int x, int y, uint8_t r, uint8_t g, uint8_t b)
 	color.r = r;
 	color.g = g;
 	color.b = b;
-
+	
 	textDestination = TTF_RenderText_Solid((TTF_Font*)assetData, text, color);
 	SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, textDestination);
 

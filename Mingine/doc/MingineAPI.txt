@@ -44,7 +44,7 @@ II.ii Other Notes
 
 II.iii Mingine Functions
 
-You can call these 33 native functions from your lua scripts.
+You can call these native functions from your lua scripts.
 
 LoadImage(pathToImageFile) 
     pathToImageFile: path to the actual image asset, for example, LoadImage("spaceGame/space.png"). .png is supported.
@@ -142,6 +142,9 @@ PlayMusic(reference musicAsset)
     
     Plays an audio file that loops forever (or until another music file is played). The audio asset may be streamed as needed rather than loaded completely into memory. If music is already playing when PlayMusic() is called, the current music will stop before the next music asset begins playing.
 
+StopMusic()
+    If any music is currently playing, calling this function will stop it.
+    
 IsKeyDown(int keyIndex)
     keyIndex: uses SDL scancodes. Mingine duplicates these scan codes in the file scanCodes.lua. If you use the constants from that file, the keys will map to their expected values.
 
