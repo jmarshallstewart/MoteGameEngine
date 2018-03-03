@@ -54,6 +54,7 @@ function Update()
     
     mouseX, mouseY = GetMousePosition()
         
+    -- left click
     if IsMouseButtonDown(1) then
         for i = 1, #waypoints do
             if IsPointInCircle(mouseX, mouseY, waypoints[i].x, waypoints[i].y, ARRIVE_DISTANCE) then
@@ -90,6 +91,7 @@ function Update()
         end
     end
     
+    -- right click
     if IsMouseButtonDown(3) then
         if selectedWaypoint == nil then
             for i = 1, #waypoints do
@@ -106,6 +108,7 @@ function Update()
         selectedWaypoint = nil
     end
     
+    -- delete
     if IsKeyPressed(SDL_SCANCODE_DELETE) then
         for i = 1, #waypoints do
             if IsPointInCircle(mouseX, mouseY, waypoints[i].x, waypoints[i].y, ARRIVE_DISTANCE) then
