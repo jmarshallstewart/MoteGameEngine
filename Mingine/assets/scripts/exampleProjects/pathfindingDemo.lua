@@ -109,7 +109,7 @@ function Update()
     if IsKeyPressed(SDL_SCANCODE_DELETE) then
         for i = 1, #waypoints do
             if IsPointInCircle(mouseX, mouseY, waypoints[i].x, waypoints[i].y, ARRIVE_DISTANCE) then
-                --remove links associated with removed waypoints.
+                --remove links associated with removed waypoint.
                 for j = #links, 1, -1 do
                     if (links[j].start == i) or (links[j].finish == i) then
                         table.remove(links, j)
