@@ -382,7 +382,7 @@ function LoadMap(mapFile)
     if not windowCreated then
         CreateWindow(map.width * map.tileSize, map.height * map.tileSize)
         
-        font = LoadFont("fonts/8_bit_pusab.ttf", 18)  
+        font = LoadFont("fonts/8_bit_pusab.ttf", 12)  
 
         jumpSfx = LoadSound("sfx/shoot.wav")
         landSfx = LoadSound("sfx/bounce.wav")
@@ -451,5 +451,4 @@ function Draw()
     DrawMonsters()
     DrawPlayer()
     DrawText("E: " .. player.enemyDefeats .. "  T: " .. player.treasures .. "  D: " .. player.defeats, 8, 9, font, 255, 255, 255)
-    DrawText("X: " .. player.x .. "  y: " .. player.y, 8, 36, font, 255, 255, 255)
 end
