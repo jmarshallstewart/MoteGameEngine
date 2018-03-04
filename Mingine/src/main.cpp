@@ -17,6 +17,11 @@ using namespace mingine;
 const int FPS = 60;
 const int FRAME_TIME_NS = (1000 / FPS) * 1000 * 1000;
 
+// swap the following two lines if you want to ignore
+// lua features and write your code natively.
+//const char * const CONFIG_FILE = "assets/scripts/core/noop.lua";
+const char * const CONFIG_FILE = "config.lua";
+
 namespace mingine {
 	extern const int NUM_SDL_SCANCODES = 512;
 	extern bool prevKeys[NUM_SDL_SCANCODES];
@@ -503,6 +508,13 @@ int LoadTmxFile(lua_State* state)
 } // end of extern "C"
 #endif
 
+// move these to a separate header/implmentation if
+// you plan to do serious work in them, just to keep
+// main focused on binding with lua.
+void Start();
+void Update();
+void Draw();
+
 int main(int argc, char* argv[])
 {
 	// we need these parameters for SDLmain, but some compilers will 
@@ -548,8 +560,9 @@ int main(int argc, char* argv[])
 	lua_register(luaState, "SetAssetBasePath", SetAssetBasePath);
 	lua_register(luaState, "LoadTmxFile", LoadTmxFile);
         
-    runScript(luaState, "config.lua");
+    runScript(luaState, CONFIG_FILE);
     call(luaState, "Start");
+	Start();
         
 	// after http://gameprogrammingpatterns.com/game-loop.html
 	using namespace std::chrono;
@@ -569,6 +582,7 @@ int main(int argc, char* argv[])
 		{
 			updateInput(&mouseX, &mouseY);
 			call(luaState, "Update");
+			Update();
 			endUpdate();
 
 			behind -= FRAME_TIME_NS;
@@ -576,6 +590,7 @@ int main(int argc, char* argv[])
 		
 		beginFrame();
 		call(luaState, "Draw");
+		Draw();
 		presentFrame();
 		//presentFrameRotating();
 	}
@@ -585,4 +600,29 @@ int main(int argc, char* argv[])
     assetDatabase.clear();
     freePlatform();	
 	return 0;
+}
+
+// Move the three functions below to a separate .h/.cpp if
+// you plan to do serious work in native code. This will
+// keep your code separated from main.cpp, which is focused
+// on the game loop and lua integration. 
+
+void Start()
+{
+	/*if (!initPlatform(1024, 768, false))
+	{
+		freePlatform();
+	}
+
+	setWindowTitle("Native Mingine Example");*/
+}
+
+void Update()
+{
+
+}
+
+void Draw()
+{
+	//clearScreen(68, 136, 204);
 }
