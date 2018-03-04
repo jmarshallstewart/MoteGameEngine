@@ -137,8 +137,7 @@ function WriteWaypointsFile()
         end
         
         file:write("}\n")
-        
-        file:flush()
+                
         file:close()
     end
 end
