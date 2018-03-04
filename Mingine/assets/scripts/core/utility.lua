@@ -11,11 +11,11 @@ end
 
 -- boolean helpers: 
 
-function Pick(condition, trueReturnValue, falseReturnFalse)
+function Pick(condition, trueReturnValue, falseReturnValue)
     if condition == true then
         return trueReturnValue
     else
-        return falseReturnFalse
+        return falseReturnValue
     end
 end
 
