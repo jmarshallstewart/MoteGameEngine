@@ -30,7 +30,6 @@ function StepPath(start, goal, searchSpace)
         
         for n = 1, #currentNode.neighbors do
             local neighbor = currentNode.neighbors[n]
-            Log(neighbor.x .. " " .. neighbor.y)
             if not Contains(closedList, neighbor) then
                 local gCost = currentNode.g + Distance(currentNode.x, currentNode.y, neighbor.x, neighbor.y)
                 
