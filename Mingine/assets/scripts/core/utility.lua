@@ -1,3 +1,5 @@
+-- random helpers:
+
 function GetRandomColor()
     local r = math.random(0, 255)
     local g = math.random(0, 255)
@@ -6,13 +8,24 @@ function GetRandomColor()
     return r, g, b, a
 end
 
-function BoolToString(value)
-    if value == true then
-        return "true"
+
+-- boolean helpers: 
+
+function Pick(condition, trueReturnValue, falseReturnFalse)
+    if condition == true then
+        return trueReturnValue
     else
-        return "false"
+        return falseReturnFalse
     end
 end
+
+-- convert boolean value to string value
+function BoolToString(boolValue)
+    return Pick(boolValue, "true", "false")
+end
+
+
+-- table helpers:
 
 -- t is the table to be cleared.
 function ClearTable(t)
@@ -36,13 +49,8 @@ function Contains(t, value)
     return false
 end
 
-function Pick(condition, trueReturnValue, falseReturnFalse)
-    if condition == true then
-        return trueReturnValue
-    else
-        return falseReturnFalse
-    end
-end
+
+-- file IO helpers:
 
 -- see: https://stackoverflow.com/questions/4990990/lua-check-if-a-file-exists
 function IsFileReadable(fileName)
