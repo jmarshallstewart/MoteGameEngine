@@ -114,8 +114,7 @@ end
 function LoadWaypointsFile()
     local file = io.open(waypointsFilePath, "r")
     local script = file:read("*all")
-    local s = load(script)
-    s()
+    load(script)()
     file:close()
 end
 
