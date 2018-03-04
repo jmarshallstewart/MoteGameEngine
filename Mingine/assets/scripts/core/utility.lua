@@ -22,8 +22,18 @@ function ClearTable(t)
 end
 
 -- returns true if table t has a value for the given key
-function Contains(t, key)
-    return t[key] ~= nil
+--function Contains(t, key)
+--    return t[key] ~= nil
+--end
+
+function Contains(t, value)
+    for k,v in pairs(t) do
+        if v == value then
+            return true
+        end
+    end
+    
+    return false
 end
 
 function Pick(condition, trueReturnValue, falseReturnFalse)
