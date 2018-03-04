@@ -7,16 +7,13 @@ SCREEN_HEIGHT = 768
 ARRIVE_DISTANCE = 14
 MAX_ACCELERATION = 1.0 -- how fast can the agent change direction and speed?
 
---when reading about A*, waypoints and links are nodes and edges.
-waypoints = {}
-links = {}
-
 --user interface state
 MODE_WAYPOINT_AUTHORING = 1
 MODE_AGENT_PATHFINDING_DEMO = 2
 isLeftClickDragging = false
 selectedWaypoint = nil
 mode = MODE_WAYPOINT_AUTHORING
+waypointsFilePath = scriptDirectory .. "exampleProjects/graph.txt"
 
 --assumes nodes have x, y position and edges have start and finish indices into nodes list.
 function GenerateWaypointGraph(nodes, edges)
@@ -114,6 +111,39 @@ function ResetAgent()
     agent.targetWaypoint = 1
 end
 
+function LoadWaypointsFile()
+    local file = io.open(waypointsFilePath, "r")
+    local script = file:read("*all")
+    local s = load(script)
+    s()
+    file:close()
+end
+
+function WriteWaypointsFile()
+    local file = io.open(waypointsFilePath, "w")
+            
+    if waypoints ~= nil and links ~= nil then
+        file:write("waypoints = {\n")
+        
+        for n = 1, #waypoints do
+            file:write("    { x = ", waypoints[n].x, ", y = ", waypoints[n].y, " },\n")
+        end
+        
+        file:write("}\n")
+        
+        file:write("\nlinks = {\n")
+        
+        for e = 1, #links do
+            file:write("    { start = ", links[e].start, ", finish = ", links[e].finish, "},\n")
+        end
+        
+        file:write("}\n")
+        
+        file:flush()
+        file:close()
+    end
+end
+
 function UpdateModeWaypointAuthoring()
     local mouseX, mouseY = GetMousePosition()
 
@@ -194,6 +224,8 @@ function UpdateModeWaypointAuthoring()
                 break
             end
         end
+    elseif IsKeyPressed(SDL_SCANCODE_S) then
+        WriteWaypointsFile()
     end
 end
 
@@ -228,20 +260,24 @@ end
 
 function DrawWaypointGraph()
     -- draw links between waypoints
-    SetDrawColor(255, 255, 255, 255)
-    for i = 1, #links do
-        local startX = waypoints[links[i].start].x
-        local startY = waypoints[links[i].start].y
-        local finishX = waypoints[links[i].finish].x
-        local finishY = waypoints[links[i].finish].y
-        
-        DrawLine(startX, startY, finishX, finishY)
+    if links ~= nil then
+        SetDrawColor(255, 255, 255, 255)
+        for i = 1, #links do
+            local startX = waypoints[links[i].start].x
+            local startY = waypoints[links[i].start].y
+            local finishX = waypoints[links[i].finish].x
+            local finishY = waypoints[links[i].finish].y
+            
+            DrawLine(startX, startY, finishX, finishY)
+        end
     end
            
     -- draw the waypoints (radius = arrive distance)
-    SetDrawColor(33, 0, 255, 255)
-    for i = 1, #waypoints do
-        DrawCircle(waypoints[i].x, waypoints[i].y, ARRIVE_DISTANCE)
+    if waypoints ~= nil then
+        SetDrawColor(33, 0, 255, 255)
+        for i = 1, #waypoints do
+            DrawCircle(waypoints[i].x, waypoints[i].y, ARRIVE_DISTANCE)
+        end
     end
 end
 
@@ -267,6 +303,14 @@ function Start()
     agent.maxSpeed = 8
     agent.path = {}
     agent.targetWaypoint = 1
+    
+    --when reading about A*, waypoints and links are nodes and edges.
+    if IsFileReadable(waypointsFilePath) then
+        LoadWaypointsFile()
+    else
+        waypoints = {}
+        links = {}
+    end
 end
 
 function Update()

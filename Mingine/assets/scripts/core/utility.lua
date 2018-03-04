@@ -43,3 +43,14 @@ function Pick(condition, trueReturnValue, falseReturnFalse)
         return falseReturnFalse
     end
 end
+
+-- see: https://stackoverflow.com/questions/4990990/lua-check-if-a-file-exists
+function IsFileReadable(fileName)
+    local file = io.open(fileName, "r")
+    if file ~= nil then
+        io.close(file)
+        return true
+    else
+        return false
+    end
+end
