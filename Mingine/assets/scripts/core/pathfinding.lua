@@ -1,6 +1,6 @@
-statusSearching = 0
-statusPathFound = 1
-statusNoPathFound = 2
+PATHFINDING_STATUS_SEARCHING = 0
+PATHFINDING_STATUS_PATH_FOUND = 1
+PATHFINDING_STATUS_NO_PATH_FOUND = 2
 
 -- call this each time you make a new path query,
 -- before calling stepPath
@@ -20,7 +20,7 @@ function StepPath(start, goal, searchSpace)
         --if the current node is the destination, we're done. Return the node.
         if currentNode == goal then
             resultPath = currentNode
-            return statusPathFound
+            return PATHFINDING_STATUS_PATH_FOUND
         end
         
         --add the lowest cost node to the closed list.
@@ -50,8 +50,8 @@ function StepPath(start, goal, searchSpace)
             end
         end
         
-        return statusSearching
+        return PATHFINDING_STATUS_SEARCHING
     end
     
-    return statusNoPathFound
+    return PATHFINDING_STATUS_NO_PATH_FOUND
 end

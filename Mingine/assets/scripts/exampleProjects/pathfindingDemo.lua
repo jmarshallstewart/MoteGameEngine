@@ -17,7 +17,6 @@ MODE_AGENT_PATHFINDING_DEMO = 2
 isLeftClickDragging = false
 selectedWaypoint = nil
 mode = MODE_WAYPOINT_AUTHORING
-isPathing = false
 
 --assumes nodes have x, y position and edges have start and finish indices into nodes list.
 function GenerateWaypointGraph(nodes, edges)
@@ -43,23 +42,23 @@ function GenerateWaypointGraph(nodes, edges)
 end
 
 function FindPath(start, finish)
-    path = nil
+    agent.path = nil
     PathInit(start)
     
-    local status = statusSearching
+    local status = PATHFINDING_STATUS_SEARCHING
     
-    while status == statusSearching do
+    while status == PATHFINDING_STATUS_SEARCHING do
         status = StepPath(start, finish, searchSpace)
     end
     
-    if status == statusPathFound then
+    if status == PATHFINDING_STATUS_PATH_FOUND then
         --reverse the path by traversing the parent
         --points and inserting the next node at the start
         --of the path to the be followed.
-        path = {}
+        agent.path = {}
         local next = resultPath
         while next ~= nil do
-            table.insert(path, 1, next)
+            table.insert(agent.path, 1, next)
             next = next.parent
         end
     else
@@ -78,9 +77,9 @@ function TryStartPathfinding(goalX, goalY)
         
     FindPath(sNode, fNode)
         
-    if path ~= nil then
+    if agent.path ~= nil then
         agent.targetWaypoint = 1
-        isPathing = true
+        agent.isPathing = true
     end
 end
 
@@ -106,8 +105,8 @@ function GetNearestWaypoint(x, y)
 end
 
 function ResetAgent()
-    path = {}
-    isPathing = false
+    agent.isPathing = false
+    agent.path = {}
     agent.velocity.x = 0
     agent.velocity.y = 0
     agent.acceleration.x = 0
@@ -200,9 +199,9 @@ end
 
 function UpdateModeAgentDemo()
     
-    if isPathing then
+    if agent.isPathing then
         --get the next waypoint along the path
-        local next = path[agent.targetWaypoint]
+        local next = agent.path[agent.targetWaypoint]
 
         --next waypoint on the path is our seek target. 
         --accelerate toward that.
@@ -217,7 +216,7 @@ function UpdateModeAgentDemo()
         --waypoint as the new target (wrapping back to the first waypoint if needed)
         if Distance(agent.x, agent.y, next.x, next.y) <= ARRIVE_DISTANCE then
             agent.targetWaypoint = agent.targetWaypoint + 1
-            if agent.targetWaypoint > #path then
+            if agent.targetWaypoint > #agent.path then
                 ResetAgent()
             end
         end
@@ -294,9 +293,11 @@ function Draw()
     DrawWaypointGraph()
     
     -- draw path
-    SetDrawColor(255, 0, 255, 255)
-    for i = 1, #agent.path do
-        DrawCircle(agent.path[i].x, agent.path[i].y, ARRIVE_DISTANCE)
+    if agent.path ~= nil then
+        SetDrawColor(255, 0, 255, 255)
+        for i = 1, #agent.path do
+            DrawCircle(agent.path[i].x, agent.path[i].y, ARRIVE_DISTANCE)
+        end
     end
     
     -- draw pathfinding agent.
