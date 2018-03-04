@@ -25,9 +25,7 @@ function StepPath(start, goal, searchSpace)
         
         --add the lowest cost node to the closed list.
 		closedList[#closedList + 1] = currentNode
-        
-        local parent = currentNode.parent
-        
+                       
         for n = 1, #currentNode.neighbors do
             local neighbor = currentNode.neighbors[n]
             if not Contains(closedList, neighbor) then
