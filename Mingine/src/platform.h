@@ -8,21 +8,21 @@ const int MAX_STRING = 512;
 
 namespace Render
 {
-	enum Setting
-	{
-		DrawColor,
-		LogicalSize,
-		Scale,
-	};
+    enum Setting
+    {
+        DrawColor,
+        LogicalSize,
+        Scale,
+    };
 }
 
 // unifies passing of parameters to set various render states,
 // which frees us from writing a new function per render state setting.
 union RenderParameters
 {
-	int i[4];
-	uint8_t u8[4];
-	float f[2];
+    int i[4];
+    uint8_t u8[4];
+    float f[2];
 };
 
 void log(const char* message);
