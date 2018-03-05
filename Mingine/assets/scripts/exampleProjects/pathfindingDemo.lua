@@ -421,7 +421,7 @@ function Update()
 end
 
 function Draw()
-    ClearScreen(68, 136, 204)
+    ClearScreen(15, 15, 15)
     
     DrawWaypointGraph()
        
