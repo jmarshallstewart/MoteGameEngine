@@ -17,11 +17,16 @@ using namespace mingine;
 const int FPS = 60;
 const int FRAME_TIME_NS = (1000 / FPS) * 1000 * 1000;
 
+// swap the following two lines if you want to ignore
+// lua features and write your code natively.
+//const char * const CONFIG_FILE = "assets/scripts/core/noop.lua";
+const char * const CONFIG_FILE = "config.lua";
+
 namespace mingine {
-	extern const int NUM_SDL_SCANCODES = 512;
-	extern bool prevKeys[NUM_SDL_SCANCODES];
-	extern bool keys[NUM_SDL_SCANCODES];
-	extern char stringBuilderBuffer[MAX_STRING];
+    extern const int NUM_SDL_SCANCODES = 512;
+    extern bool prevKeys[NUM_SDL_SCANCODES];
+    extern bool keys[NUM_SDL_SCANCODES];
+    extern char stringBuilderBuffer[MAX_STRING];
 }
 
 // the entire game state lives here
@@ -34,7 +39,7 @@ bool quit = false;
 void error(const char* message)
 {
     log(message);
-	showErrorBox(message);
+    showErrorBox(message);
     quit = true;
 }
 
@@ -46,8 +51,8 @@ void printError(lua_State* state)
 
 void setGlobal(const char* globalName, int value)
 {
-	lua_pushinteger(luaState, value);
-	lua_setglobal(luaState, globalName);
+    lua_pushinteger(luaState, value);
+    lua_setglobal(luaState, globalName);
 }
 
 void runScript(lua_State* state, const char* file)
@@ -92,13 +97,13 @@ int loadAsset(lua_State* state, AssetType assetType)
     loadParameters.path = lua_tostring(state, 1);
     loadParameters.assetType = assetType;
 
-	std::string errorMessage("");
-	int id = assetDatabase.add(loadParameters, errorMessage);
+    std::string errorMessage("");
+    int id = assetDatabase.add(loadParameters, errorMessage);
 
-	if (errorMessage != "")
-	{
-		error(errorMessage.c_str());
-	}
+    if (errorMessage != "")
+    {
+        error(errorMessage.c_str());
+    }
 
     lua_pushnumber(state, id);
     return 1;
@@ -130,13 +135,13 @@ int LoadFont(lua_State* state)
     loadParameters.size = (int)(lua_tointeger(state, 2));
     loadParameters.assetType = AssetFont;
 
-	std::string errorMessage("");
+    std::string errorMessage("");
     int id = assetDatabase.add(loadParameters, errorMessage);
 
-	if (errorMessage != "")
-	{
-		error(errorMessage.c_str());
-	}
+    if (errorMessage != "")
+    {
+        error(errorMessage.c_str());
+    }
 
     lua_pushnumber(state, id);
     return 1;
@@ -144,106 +149,106 @@ int LoadFont(lua_State* state)
 
 int GetDrawColor(lua_State* state)
 {
-	RenderParameters renderParameters;
+    RenderParameters renderParameters;
 
-	getRenderState(Render::DrawColor, renderParameters);
+    getRenderState(Render::DrawColor, renderParameters);
 
-	lua_pushinteger(state, renderParameters.u8[0]);
-	lua_pushinteger(state, renderParameters.u8[1]);
-	lua_pushinteger(state, renderParameters.u8[2]);
-	lua_pushinteger(state, renderParameters.u8[3]);
-	return 4;
+    lua_pushinteger(state, renderParameters.u8[0]);
+    lua_pushinteger(state, renderParameters.u8[1]);
+    lua_pushinteger(state, renderParameters.u8[2]);
+    lua_pushinteger(state, renderParameters.u8[3]);
+    return 4;
 }
 
 int GetDrawLogicalSize(lua_State* state)
 {
-	RenderParameters renderParameters;
+    RenderParameters renderParameters;
 
-	getRenderState(Render::LogicalSize, renderParameters);
+    getRenderState(Render::LogicalSize, renderParameters);
 
-	lua_pushinteger(state, renderParameters.i[0]);
-	lua_pushinteger(state, renderParameters.i[1]);
-	return 2;
+    lua_pushinteger(state, renderParameters.i[0]);
+    lua_pushinteger(state, renderParameters.i[1]);
+    return 2;
 }
 
 int GetDrawScale(lua_State* state)
 {
-	RenderParameters renderParameters;
+    RenderParameters renderParameters;
 
-	getRenderState(Render::Scale, renderParameters);
+    getRenderState(Render::Scale, renderParameters);
 
-	lua_pushnumber(state, renderParameters.f[0]);
-	lua_pushnumber(state, renderParameters.f[1]);
-	return 2;
+    lua_pushnumber(state, renderParameters.f[0]);
+    lua_pushnumber(state, renderParameters.f[1]);
+    return 2;
 }
 
 int SetDrawColor(lua_State* state)
 {
-	RenderParameters renderParameters;
+    RenderParameters renderParameters;
 
-	renderParameters.u8[0] = (uint8_t)lua_tointeger(state, 1);
-	renderParameters.u8[1] = (uint8_t)lua_tointeger(state, 2);
-	renderParameters.u8[2] = (uint8_t)lua_tointeger(state, 3);
-	renderParameters.u8[3] = (uint8_t)lua_tointeger(state, 4);
+    renderParameters.u8[0] = (uint8_t)lua_tointeger(state, 1);
+    renderParameters.u8[1] = (uint8_t)lua_tointeger(state, 2);
+    renderParameters.u8[2] = (uint8_t)lua_tointeger(state, 3);
+    renderParameters.u8[3] = (uint8_t)lua_tointeger(state, 4);
 
-	setRenderState(Render::DrawColor, renderParameters);
-	return 0;
+    setRenderState(Render::DrawColor, renderParameters);
+    return 0;
 }
 
 int SetDrawLogicalSize(lua_State* state)
 {
-	RenderParameters renderParameters;
+    RenderParameters renderParameters;
 
-	renderParameters.i[0] = (int)lua_tointeger(state, 1);
-	renderParameters.i[1] = (int)lua_tointeger(state, 2);
+    renderParameters.i[0] = (int)lua_tointeger(state, 1);
+    renderParameters.i[1] = (int)lua_tointeger(state, 2);
 
-	setRenderState(Render::LogicalSize, renderParameters);
-	return 0;
+    setRenderState(Render::LogicalSize, renderParameters);
+    return 0;
 }
 
 int SetDrawScale(lua_State* state)
 {
-	RenderParameters renderParameters;
+    RenderParameters renderParameters;
 
-	renderParameters.f[0] = (float)lua_tonumber(state, 1);
-	renderParameters.f[1] = (float)lua_tonumber(state, 2);
+    renderParameters.f[0] = (float)lua_tonumber(state, 1);
+    renderParameters.f[1] = (float)lua_tonumber(state, 2);
 
-	setRenderState(Render::Scale, renderParameters);
-	return 0;
+    setRenderState(Render::Scale, renderParameters);
+    return 0;
 }
 
 int DrawImage(lua_State* state)
 {
-	// the number of function arguments is the index of the topmost value
-	// on the stack. Neat.
-	int numArguments = lua_gettop(state);
+    // the number of function arguments is the index of the topmost value
+    // on the stack. Neat.
+    int numArguments = lua_gettop(state);
 
     int id = (int)lua_tointeger(state, 1);
     int x = (int)lua_tonumber(state, 2);
     int y = (int)lua_tonumber(state, 3);
 
-	double angle = 0;
-	if (numArguments >= 4)
-	{
-		angle = lua_tonumber(state, 4);
-	}
+    double angle = 0;
+    if (numArguments >= 4)
+    {
+        angle = lua_tonumber(state, 4);
+    }
 
-	double scale = 1.0;
-	if (numArguments >= 5)
-	{
-		scale = lua_tonumber(state, 5);
-	}
+    double scale = 1.0;
+    if (numArguments >= 5)
+    {
+        scale = lua_tonumber(state, 5);
+    }
 
-	uint8_t r = 0xff;
-	uint8_t g = 0xff;
-	uint8_t b = 0xff;
+    uint8_t r = 0xff;
+    uint8_t g = 0xff;
+    uint8_t b = 0xff;
 
-	if (numArguments >= 8)
-	{
-		r = (uint8_t)lua_tointeger(state, 6);
-		g = (uint8_t)lua_tointeger(state, 7);
-		b = (uint8_t)lua_tointeger(state, 8);
-	}
+    if (numArguments >= 8)
+    {
+        r = (uint8_t)lua_tointeger(state, 6);
+        g = (uint8_t)lua_tointeger(state, 7);
+        b = (uint8_t)lua_tointeger(state, 8);
+    }
 
     Image* image = assetDatabase.get<Image>(id);
     image->draw(x, y, angle, scale, r, g, b);
@@ -253,38 +258,38 @@ int DrawImage(lua_State* state)
 
 int DrawImageFrame(lua_State* state)
 {
-	int id = (int)lua_tonumber(state, 1);
+    int id = (int)lua_tonumber(state, 1);
     int x = (int)lua_tonumber(state, 2);
     int y = (int)lua_tonumber(state, 3);
     int width = (int)lua_tonumber(state, 4);
     int height = (int)lua_tonumber(state, 5);
     int frame = (int)lua_tonumber(state, 6);
 
-	int numArguments = lua_gettop(state);
+    int numArguments = lua_gettop(state);
 
-	double angle = 0;
-	if (numArguments >= 7)
-	{
-		angle = lua_tonumber(state, 7);
-	}
+    double angle = 0;
+    if (numArguments >= 7)
+    {
+        angle = lua_tonumber(state, 7);
+    }
 
-	double scale = 1.0;
-	if (numArguments >= 8)
-	{
-		scale = lua_tonumber(state, 8);
-	}
+    double scale = 1.0;
+    if (numArguments >= 8)
+    {
+        scale = lua_tonumber(state, 8);
+    }
 
-	uint8_t r = 0xff;
-	uint8_t g = 0xff;
-	uint8_t b = 0xff;
+    uint8_t r = 0xff;
+    uint8_t g = 0xff;
+    uint8_t b = 0xff;
 
-	if (numArguments >= 11)
-	{
-		r = (uint8_t)lua_tointeger(state, 9);
-		g = (uint8_t)lua_tointeger(state, 10);
-		b = (uint8_t)lua_tointeger(state, 11);
-	}
-	
+    if (numArguments >= 11)
+    {
+        r = (uint8_t)lua_tointeger(state, 9);
+        g = (uint8_t)lua_tointeger(state, 10);
+        b = (uint8_t)lua_tointeger(state, 11);
+    }
+    
     Image* image = assetDatabase.get<Image>(id);
     image->drawFrame(x, y, width, height, frame, angle, scale, r, g, b);
 
@@ -309,54 +314,54 @@ int DrawText(lua_State* state)
 
 int DrawPoint(lua_State* state)
 {
-	int x = (int)lua_tointeger(state, 1);
-	int y = (int)lua_tointeger(state, 2);
-	
-	drawPoint(x, y);
-	return 0;
+    int x = (int)lua_tointeger(state, 1);
+    int y = (int)lua_tointeger(state, 2);
+    
+    drawPoint(x, y);
+    return 0;
 }
 
 int DrawLine(lua_State* state)
 {
-	int startX = (int)lua_tonumber(state, 1);
-	int startY = (int)lua_tonumber(state, 2);
-	int endX = (int)lua_tonumber(state, 3);
-	int endY = (int)lua_tonumber(state, 4);
-	
-	drawLine(startX, startY, endX, endY);
-	return 0;
+    int startX = (int)lua_tonumber(state, 1);
+    int startY = (int)lua_tonumber(state, 2);
+    int endX = (int)lua_tonumber(state, 3);
+    int endY = (int)lua_tonumber(state, 4);
+    
+    drawLine(startX, startY, endX, endY);
+    return 0;
 }
 
 int DrawCircle(lua_State* state)
 {
-	int x = (int)lua_tonumber(state, 1);
-	int y = (int)lua_tonumber(state, 2);
-	int radius = (int)lua_tonumber(state, 3);
-		
-	drawCircle(x, y, radius);
-	return 0;
+    int x = (int)lua_tonumber(state, 1);
+    int y = (int)lua_tonumber(state, 2);
+    int radius = (int)lua_tonumber(state, 3);
+        
+    drawCircle(x, y, radius);
+    return 0;
 }
 
 int DrawRect(lua_State* state)
 {
-	int x = (int)lua_tonumber(state, 1);
-	int y = (int)lua_tonumber(state, 2);
-	int w = (int)lua_tonumber(state, 3);
-	int h = (int)lua_tonumber(state, 4);
-	
-	drawRect(x, y, w, h);
-	return 0;
+    int x = (int)lua_tonumber(state, 1);
+    int y = (int)lua_tonumber(state, 2);
+    int w = (int)lua_tonumber(state, 3);
+    int h = (int)lua_tonumber(state, 4);
+    
+    drawRect(x, y, w, h);
+    return 0;
 }
 
 int FillRect(lua_State* state)
 {
-	int x = (int)lua_tonumber(state, 1);
-	int y = (int)lua_tonumber(state, 2);
-	int w = (int)lua_tonumber(state, 3);
-	int h = (int)lua_tonumber(state, 4);
-	
-	fillRect(x, y, w, h);
-	return 0;
+    int x = (int)lua_tonumber(state, 1);
+    int y = (int)lua_tonumber(state, 2);
+    int w = (int)lua_tonumber(state, 3);
+    int h = (int)lua_tonumber(state, 4);
+    
+    fillRect(x, y, w, h);
+    return 0;
 }
 
 int PlaySound(lua_State* state)
@@ -379,35 +384,35 @@ int PlayMusic(lua_State* state)
 
 int StopMusic(lua_State* state)
 {
-	stopMusic();
-	return 0;
+    stopMusic();
+    return 0;
 }
 
 int IsKeyDown(lua_State* state)
 {
     int scancode = (int)lua_tointeger(state, 1);
-	lua_pushboolean(state, keys[scancode]);
+    lua_pushboolean(state, keys[scancode]);
     return 1;
 }
 
 int IsKeyReleased(lua_State* state)
 {
-	int scancode = (int)lua_tointeger(state, 1);
-	bool is = keys[scancode];
-	bool was = prevKeys[scancode];
-	
-	lua_pushboolean(state, !is && was);
-	return 1;
+    int scancode = (int)lua_tointeger(state, 1);
+    bool is = keys[scancode];
+    bool was = prevKeys[scancode];
+    
+    lua_pushboolean(state, !is && was);
+    return 1;
 }
 
 int IsKeyPressed(lua_State* state)
 {
-	int scancode = (int)lua_tointeger(state, 1);
-	bool is = keys[scancode];
-	bool was = prevKeys[scancode];
+    int scancode = (int)lua_tointeger(state, 1);
+    bool is = keys[scancode];
+    bool was = prevKeys[scancode];
 
-	lua_pushboolean(state, is && !was);
-	return 1;
+    lua_pushboolean(state, is && !was);
+    return 1;
 }
 
 int IsMouseButtonDown(lua_State* state)
@@ -437,11 +442,11 @@ int CreateWindow(lua_State* state)
     int width = (int)lua_tointeger(state, 1);
     int height = (int)lua_tointeger(state, 2);
 
-	bool fullscreen = false;
-	if (lua_gettop(state) >= 3)
-	{
-		fullscreen = lua_toboolean(state, 3) == 1;
-	}
+    bool fullscreen = false;
+    if (lua_gettop(state) >= 3)
+    {
+        fullscreen = lua_toboolean(state, 3) == 1;
+    }
 
     if ( !initPlatform(width, height, fullscreen) )
     {
@@ -467,45 +472,52 @@ int Quit(lua_State* state)
 
 int GetFrameTime(lua_State* state)
 {
-	lua_pushnumber(state, 1000 / FPS);
-	return 1;
+    lua_pushnumber(state, 1000 / FPS);
+    return 1;
 }
 
 int ClearScreen(lua_State* state)
 {
-	uint8_t r = (uint8_t)lua_tointeger(state, 1);
-	uint8_t g = (uint8_t)lua_tointeger(state, 2);
-	uint8_t b = (uint8_t)lua_tointeger(state, 3);
-	clearScreen(r, g, b);
-	return 0;
+    uint8_t r = (uint8_t)lua_tointeger(state, 1);
+    uint8_t g = (uint8_t)lua_tointeger(state, 2);
+    uint8_t b = (uint8_t)lua_tointeger(state, 3);
+    clearScreen(r, g, b);
+    return 0;
 }
 
 int SetAssetBasePath(lua_State* state)
 {
-	const char* path = lua_tostring(state, 1);
-	assetDatabase.setBasePath(path);
+    const char* path = lua_tostring(state, 1);
+    assetDatabase.setBasePath(path);
 
-	return 0;
+    return 0;
 }
 
 int LoadTmxFile(lua_State* state)
 {
-	const char* tmxFile = lua_tostring(state, 1);
-	std::string s = "";
+    const char* tmxFile = lua_tostring(state, 1);
+    std::string s = "";
 
-	readTmx(tmxFile, "images", "map", s);
-	luaL_dostring(state, s.c_str());
-		
-	return 0;
+    readTmx(tmxFile, "images", "map", s);
+    luaL_dostring(state, s.c_str());
+        
+    return 0;
 }
 
 #ifdef __cplusplus
 } // end of extern "C"
 #endif
 
+// move these to a separate header/implmentation if
+// you plan to do serious work in them, just to keep
+// main focused on binding with lua.
+void Start();
+void Update();
+void Draw();
+
 int main(int argc, char* argv[])
 {
-	// we need these parameters for SDLmain, but some compilers will 
+    // we need these parameters for SDLmain, but some compilers will 
     // generate a warning if we don't use them. So we're "using them."
     argc, argv;
 
@@ -517,72 +529,100 @@ int main(int argc, char* argv[])
     lua_register(luaState, "LoadFont", LoadFont);
     lua_register(luaState, "LoadSound", LoadSound);
     lua_register(luaState, "LoadMusic", LoadMusic);
-	lua_register(luaState, "GetDrawColor", GetDrawColor);
-	lua_register(luaState, "GetDrawLogicalSize", GetDrawLogicalSize);
-	lua_register(luaState, "GetDrawScale", GetDrawScale);
-	lua_register(luaState, "SetDrawColor", SetDrawColor);
-	lua_register(luaState, "SetDrawLogicalSize", SetDrawLogicalSize);
-	lua_register(luaState, "SetDrawScale", SetDrawScale);
+    lua_register(luaState, "GetDrawColor", GetDrawColor);
+    lua_register(luaState, "GetDrawLogicalSize", GetDrawLogicalSize);
+    lua_register(luaState, "GetDrawScale", GetDrawScale);
+    lua_register(luaState, "SetDrawColor", SetDrawColor);
+    lua_register(luaState, "SetDrawLogicalSize", SetDrawLogicalSize);
+    lua_register(luaState, "SetDrawScale", SetDrawScale);
     lua_register(luaState, "DrawImage", DrawImage);
     lua_register(luaState, "DrawImageFrame", DrawImageFrame);
     lua_register(luaState, "DrawText", DrawText);
-	lua_register(luaState, "DrawPoint", DrawPoint);
-	lua_register(luaState, "DrawLine", DrawLine);
-	lua_register(luaState, "DrawCircle", DrawCircle);
-	lua_register(luaState, "DrawRect", DrawRect);
-	lua_register(luaState, "FillRect", FillRect);
+    lua_register(luaState, "DrawPoint", DrawPoint);
+    lua_register(luaState, "DrawLine", DrawLine);
+    lua_register(luaState, "DrawCircle", DrawCircle);
+    lua_register(luaState, "DrawRect", DrawRect);
+    lua_register(luaState, "FillRect", FillRect);
     lua_register(luaState, "PlaySound", PlaySound);
     lua_register(luaState, "PlayMusic", PlayMusic);
-	lua_register(luaState, "StopMusic", StopMusic);
+    lua_register(luaState, "StopMusic", StopMusic);
     lua_register(luaState, "IsKeyDown", IsKeyDown);
-	lua_register(luaState, "IsKeyReleased", IsKeyReleased);
-	lua_register(luaState, "IsKeyPressed", IsKeyPressed);
+    lua_register(luaState, "IsKeyReleased", IsKeyReleased);
+    lua_register(luaState, "IsKeyPressed", IsKeyPressed);
     lua_register(luaState, "IsMouseButtonDown", IsMouseButtonDown);
     lua_register(luaState, "GetMousePosition", GetMousePosition);
     lua_register(luaState, "SetWindowTitle", SetWindowTitle);
     lua_register(luaState, "CreateWindow", CreateWindow);
     lua_register(luaState, "Log", Log);
     lua_register(luaState, "Quit", Quit);
-	lua_register(luaState, "ClearScreen", ClearScreen);
-	lua_register(luaState, "GetFrameTime", GetFrameTime);
-	lua_register(luaState, "SetAssetBasePath", SetAssetBasePath);
-	lua_register(luaState, "LoadTmxFile", LoadTmxFile);
+    lua_register(luaState, "ClearScreen", ClearScreen);
+    lua_register(luaState, "GetFrameTime", GetFrameTime);
+    lua_register(luaState, "SetAssetBasePath", SetAssetBasePath);
+    lua_register(luaState, "LoadTmxFile", LoadTmxFile);
         
-    runScript(luaState, "config.lua");
+    runScript(luaState, CONFIG_FILE);
     call(luaState, "Start");
+    Start();
         
-	// after http://gameprogrammingpatterns.com/game-loop.html
-	using namespace std::chrono;
-	auto previousTime = high_resolution_clock::now();
-	long long behind = 0;
+    // after http://gameprogrammingpatterns.com/game-loop.html
+    using namespace std::chrono;
+    auto previousTime = high_resolution_clock::now();
+    long long behind = 0;
 
-	while (pollEvents(setGlobal) && !quit)
-	{
-		auto currentTime = high_resolution_clock::now();
-		auto delta = duration_cast<nanoseconds>(currentTime - previousTime);
-		behind += delta.count();
-		previousTime = currentTime;
-				
-		// probably should be while, but causes
-		// noticable frame skips with low res art
-		if (behind >= FRAME_TIME_NS)
-		{
-			updateInput(&mouseX, &mouseY);
-			call(luaState, "Update");
-			endUpdate();
+    while (pollEvents(setGlobal) && !quit)
+    {
+        auto currentTime = high_resolution_clock::now();
+        auto delta = duration_cast<nanoseconds>(currentTime - previousTime);
+        behind += delta.count();
+        previousTime = currentTime;
+                
+        // probably should be while, but causes
+        // noticable frame skips with low res art
+        if (behind >= FRAME_TIME_NS)
+        {
+            updateInput(&mouseX, &mouseY);
+            call(luaState, "Update");
+            Update();
+            endUpdate();
 
-			behind -= FRAME_TIME_NS;
-		}
-		
-		beginFrame();
-		call(luaState, "Draw");
-		presentFrame();
-		//presentFrameRotating();
-	}
-	   
+            behind -= FRAME_TIME_NS;
+        }
+        
+        beginFrame();
+        call(luaState, "Draw");
+        Draw();
+        presentFrame();
+        //presentFrameRotating();
+    }
+       
     stopMusic();
     lua_close(luaState);		
     assetDatabase.clear();
     freePlatform();	
-	return 0;
+    return 0;
+}
+
+// Move the three functions below to a separate .h/.cpp if
+// you plan to do serious work in native code. This will
+// keep your code separated from main.cpp, which is focused
+// on the game loop and lua integration. 
+
+void Start()
+{
+    /*if (!initPlatform(1024, 768, false))
+    {
+        freePlatform();
+    }
+
+    setWindowTitle("Native Mingine Example");*/
+}
+
+void Update()
+{
+
+}
+
+void Draw()
+{
+    //clearScreen(68, 136, 204);
 }

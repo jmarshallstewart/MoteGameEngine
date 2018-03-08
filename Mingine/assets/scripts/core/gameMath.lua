@@ -1,10 +1,7 @@
 -- VECTOR 2D
 
 function CreateVector(x, y)
-    local v = {}
-    v.x = x
-    v.y = y
-    return v
+    return { x = x, y = y }
 end
 
 function CreateZeroVector()
@@ -60,13 +57,15 @@ function Set(outVector, directionX, directionY, magnitude)
     outVector.x, outVector.y = Scale(outVector.x, outVector.y, magnitude)
 end
 
---mad is shorthand for "multiply then add"
---this is useful for adding a scaled vector as an offset from a point
---represented as a vector
+-- mad is shorthand for "multiply then add" aka fused multiply-add:
+-- a + b x c
+-- This is useful for adding a scaled vector as an offset from a point
+-- represented as a vector, and comes up often for dot products, matrix
+-- multiplies, etc.
 --
---parameters:
---vec1 and vec2 are tables that have .x and .y properties. 
---scale is a number.
+-- parameters:
+-- vec1 and vec2 are tables that have .x and .y properties. 
+-- scale is a number.
 function Mad(vec1, vec2, scale)
     return vec1.x + vec2.x * scale, vec1.y + vec2.y * scale
 end
@@ -96,7 +95,7 @@ end
 --end
 
 function CirclesOverlap(x1, y1, radius1, x2, y2, radius2)
-    return Distance(x1, y1, x2, y2) <= radius1 + radius1
+    return Distance(x1, y1, x2, y2) <= radius1 + radius2
 end
 
 -- BOXES
