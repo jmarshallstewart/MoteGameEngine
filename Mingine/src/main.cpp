@@ -602,7 +602,7 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-// Move the three functions below to a separate .h/.cpp if
+// Move the code below to a separate .h/.cpp if
 // you plan to do serious work in native code. This will
 // keep your code separated from main.cpp, which is focused
 // on the game loop and lua integration. 
@@ -614,12 +614,12 @@ void Start()
         freePlatform();
     }
 
-    setWindowTitle("Native Mingine Example");*/
+	setWindowTitle("Native Mingine Example");*/
 }
 
 void Update()
 {
-
+	// do nothing
 }
 
 void Draw()
