@@ -28,6 +28,9 @@ monsterScale = 0.3
 -- only create a window the first time we load a map
 windowCreated = false
 
+-- before loading a level, we draw over previous level
+shouldClearBackground = false
+
 -- helper functions
 
 -- returns the tile index for the given x y coordinates (in tile space, where 1 unit = 1 tile)
@@ -245,6 +248,7 @@ function UpdateExits()
             if BoxesOverlapWH(map.exit[i].x, map.exit[i].y, 1, 1, player.x, player.y, 1, 1) then
                 PlaySound(exitSfx)
                 LoadMap(map.exit[i].map)
+                shouldClearBackground = true
                 return
             end
         end
@@ -445,6 +449,11 @@ function Update()
 end
 
 function Draw()
+    if shouldClearBackground == true then
+        ClearScreen(0, 0, 0)
+        shouldClearBackground = false
+    end
+
     DrawWorld()
     DrawExits()
     DrawTreasures()

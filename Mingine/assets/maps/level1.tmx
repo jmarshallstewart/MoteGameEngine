@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" nextobjectid="17">
+<map version="1.0" orientation="orthogonal" renderorder="right-down" width="64" height="48" tilewidth="16" tileheight="16" nextobjectid="18">
  <properties>
   <property name="music" value="level1"/>
  </properties>
@@ -111,7 +111,12 @@
   </object>
   <object id="14" name="exit" x="912" y="48" width="16" height="16">
    <properties>
-    <property name="map" value="level2"/>
+    <property name="map" value="platformer32"/>
+   </properties>
+  </object>
+  <object id="17" name="exit" x="800" y="736" width="16" height="16">
+   <properties>
+    <property name="map" value="small"/>
    </properties>
   </object>
  </objectgroup>

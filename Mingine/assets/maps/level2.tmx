@@ -72,7 +72,7 @@
   <object id="3" name="treasure" x="160" y="272" width="16" height="16"/>
   <object id="14" name="exit" x="48" y="544" width="16" height="16">
    <properties>
-    <property name="map" value="platformer32"/>
+    <property name="map" value="level1"/>
    </properties>
   </object>
   <object id="16" name="treasure" x="480" y="192" width="16" height="16"/>

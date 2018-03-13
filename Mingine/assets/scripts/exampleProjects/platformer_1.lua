@@ -1,4 +1,4 @@
--- This projects ports the excellent tutorial found here to mingine:
+-- This projects ports to mingine the excellent tutorial found here:
 --
 -- https://codeincomplete.com/posts/tiny-platformer/
 --
@@ -15,7 +15,7 @@
 -- may have different tuning values so that they behave differently from the player.
 
 
---tuning parameters for player input
+-- tuning parameters for player input
 
 GRAVITY = 1.2
 MAX_SPEED = { x = 3.4375, y = 6.3 }
@@ -33,7 +33,7 @@ function getCell(x, y)
     return map.tiles[1][(x + (y * map.width)) + 1] -- +1 because of lua array indexing
 end
 
-function SetActor(actor, x, y)
+function InitActor(actor, x, y)
     actor.x = x
     actor.y = y
     actor.left = false
@@ -179,7 +179,7 @@ function Start()
     
     tileImage = LoadImage(map.tileAtlas)
     player = {}
-    SetActor(player, 10, 22)
+    InitActor(player, 10, 22)
 end
 
 function Update()
