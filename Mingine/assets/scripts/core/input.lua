@@ -1,3 +1,5 @@
+controller_0_attached = 0 -- 1 == true
+
 controller_0_button_0 = 0
 controller_0_button_1 = 0
 controller_0_button_2 = 0
@@ -35,6 +37,10 @@ function getLookInput()
 end
 
 function GetInputX()
+    if controller_0_attached == 0 then
+        return 0
+    end
+
     if IsKeyDown(SDL_SCANCODE_LEFT) or controller_0_hat == 8 then
         return -1.0
     elseif IsKeyDown(SDL_SCANCODE_RIGHT) or controller_0_hat == 2 then
@@ -47,6 +53,10 @@ function GetInputX()
 end
 
 function GetInputY()
+    if controller_0_attached == 0 then
+        return 0
+    end
+
     if IsKeyDown(SDL_SCANCODE_UP) or controller_0_hat == 1 then
         return -1.0
     elseif IsKeyDown(SDL_SCANCODE_DOWN) or controller_0_hat == 4 then
