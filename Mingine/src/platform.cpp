@@ -236,9 +236,13 @@ bool pollEvents(void (*eventHandler)(const char*, int value))
             break;
         case SDL_JOYDEVICEADDED:
             acquireController(event.jdevice.which);
+			snprintf(stringBuilderBuffer, sizeof(stringBuilderBuffer), "controller_%i_attached", event.jdevice.which);
+			eventHandler(stringBuilderBuffer, 1);
             break;
         case SDL_JOYDEVICEREMOVED:
             releaseController(event.jdevice.which);
+			snprintf(stringBuilderBuffer, sizeof(stringBuilderBuffer), "controller_%i_attached", event.jdevice.which);
+			eventHandler(stringBuilderBuffer, 0);
             break;
         case SDL_KEYDOWN:
             keys[event.key.keysym.scancode] = true;
