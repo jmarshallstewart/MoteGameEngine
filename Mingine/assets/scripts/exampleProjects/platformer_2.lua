@@ -315,8 +315,8 @@ function Start()
     SetPlayer(player, playerStart[1].x, playerStart[1].y)
     
     -- redirect names from tmx to names that make sense for our script.
-    monsters = enemy
-    treasures = treasure
+    monsters = map.enemy
+    treasures = map.treasure
     
     for i = 1, #monsters do
         SetMonster(monsters[i], monsters[i].x, monsters[i].y)
