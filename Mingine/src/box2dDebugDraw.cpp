@@ -40,12 +40,22 @@ void box2dDebugDraw::DrawSolidPolygon(const b2Vec2* vertices, int32 vertexCount,
 
 void box2dDebugDraw::DrawCircle(const b2Vec2& center, float32 radius, const b2Color& color)
 {
-	throw std::logic_error("Not implemented.");
+	SetDrawColor(color);
+	int x, y;
+	camera.transformVec2(center, x, y);
+	drawCircle(x, y, (int)(radius * camera.worldToScreenScale));
 }
 
 void box2dDebugDraw::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color)
 {
-	throw std::logic_error("Not implemented.");
+	// for now, ignore the requested for a solid fill...
+	DrawCircle(center, radius, color);
+
+	int x1, y1, x2, y2;
+	camera.transformVec2(center, x1, y1);
+	camera.transformVec2(center + radius * axis, x2, y2);
+
+	drawLine(x1, y1, x2, y2);
 }
 
 void box2dDebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
@@ -64,9 +74,9 @@ void box2dDebugDraw::DrawPoint(const b2Vec2& p, float32 size, const b2Color& col
 {
 	SetDrawColor(color);
 
-	int x1, y1;
-	camera.transformVec2(p, x1, y1);
-	drawPoint(x1, y1);
+	int x, y;
+	camera.transformVec2(p, x, y);
+	drawPoint(x, y);
 }
 
 void box2dDebugDraw::SetDrawColor(const b2Color& color)

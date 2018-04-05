@@ -685,7 +685,7 @@ void Start()
 	b2PolygonShape groundBox;
 
 	// The extents are the half-widths of the box.
-	groundBox.SetAsBox(50.0f, 10.0f);
+	groundBox.SetAsBox(25.0f, 10.0f);
 
 	// Add the ground fixture to the ground body.
 	groundBody->CreateFixture(&groundBox, 0.0f);
@@ -709,6 +709,22 @@ void Start()
 	
 	// Add the shape to the body.
 	body->CreateFixture(&fixtureDef);
+
+	// create a circular body
+	b2BodyDef bd;
+	bd.position.Set(25.5f, 10.0f);
+	bd.type = b2_dynamicBody;
+		
+	b2Body* body = world.CreateBody(&bd);
+
+	b2CircleShape shape;
+	shape.m_radius = 1.5f;
+
+	b2FixtureDef fd;
+	fd.shape = &shape;
+	fd.density = 20.0f;
+	fd.restitution = 0.8f;
+	body->CreateFixture(&fd);
 }
 
 void Update()
