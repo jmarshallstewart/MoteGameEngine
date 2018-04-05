@@ -164,6 +164,7 @@ xcopy "$(SolutionDir)packages\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\li
   <ItemGroup>
     <ClCompile Include="src\asset.cpp" />
     <ClCompile Include="src\assetDatabase.cpp" />
+    <ClCompile Include="src\box2dDebugDraw.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\platform.cpp" />
     <ClCompile Include="src\tinyxml2.cpp" />
@@ -172,6 +173,7 @@ xcopy "$(SolutionDir)packages\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\li
   <ItemGroup>
     <ClInclude Include="src\asset.h" />
     <ClInclude Include="src\assetDatabase.h" />
+    <ClInclude Include="src\box2dDebugDraw.h" />
     <ClInclude Include="src\platform.h" />
     <ClInclude Include="src\tinyxml2.h" />
     <ClInclude Include="src\tmxToLua.h" />
@@ -196,6 +198,7 @@ xcopy "$(SolutionDir)packages\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\li
     <Import Project="..\packages\sdl2_mixer.vc.2.0.1.1\build\native\sdl2_mixer.vc.targets" Condition="Exists('..\packages\sdl2_mixer.vc.2.0.1.1\build\native\sdl2_mixer.vc.targets')" />
     <Import Project="..\packages\lua.redist.5.3.4\build\native\lua.redist.targets" Condition="Exists('..\packages\lua.redist.5.3.4\build\native\lua.redist.targets')" />
     <Import Project="..\packages\lua.5.3.4\build\native\lua.targets" Condition="Exists('..\packages\lua.5.3.4\build\native\lua.targets')" />
+    <Import Project="..\packages\Box2D.2.3.0\build\native\Box2D.targets" Condition="Exists('..\packages\Box2D.2.3.0\build\native\Box2D.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -216,5 +219,6 @@ xcopy "$(SolutionDir)packages\zlib.v140.windesktop.msvcstl.dyn.rt-dyn.1.2.8.8\li
     <Error Condition="!Exists('..\packages\sdl2_mixer.vc.2.0.1.1\build\native\sdl2_mixer.vc.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\sdl2_mixer.vc.2.0.1.1\build\native\sdl2_mixer.vc.targets'))" />
     <Error Condition="!Exists('..\packages\lua.redist.5.3.4\build\native\lua.redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\lua.redist.5.3.4\build\native\lua.redist.targets'))" />
     <Error Condition="!Exists('..\packages\lua.5.3.4\build\native\lua.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\lua.5.3.4\build\native\lua.targets'))" />
+    <Error Condition="!Exists('..\packages\Box2D.2.3.0\build\native\Box2D.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Box2D.2.3.0\build\native\Box2D.targets'))" />
   </Target>
 </Project>
