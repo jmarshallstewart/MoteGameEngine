@@ -7,7 +7,7 @@ OBJ_NAME = mingine_Run
 
 #This is the target that compiles our executable
 all : $(OBJS)
-	g++ $(OBJS) -std=gnu++11 -w -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -llua5.3 -o $(OBJ_NAME)
+	g++ $(OBJS) -std=gnu++11 -w -lSDL2 -lSDL2_image -lSDL2_mixer -lSDL2_ttf -llua5.3 -Box2D -o $(OBJ_NAME)
 
 
 
