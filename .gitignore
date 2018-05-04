@@ -30,6 +30,14 @@
 *.exe
 *.out
 *.app
+.vs/Mingine/v14/.suo
+Debug/
+packages/
+Mingine/Mingine.vcxproj.user
+Mingine/assets/scripts/myProjects/
+Mingine/Release/
+Release/
+Mingine/assets/scripts/privateProjects/
 *mingine_Run
 
 # Visual Studio files
@@ -42,3 +50,5 @@
 *.db
 *.opendb
 packages/
+
+\.vs/Mingine/v15/\.suo
