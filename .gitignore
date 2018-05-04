@@ -50,3 +50,5 @@ Mingine/assets/scripts/privateProjects/
 *.db
 *.opendb
 packages/
+
+\.vs/Mingine/v15/\.suo
