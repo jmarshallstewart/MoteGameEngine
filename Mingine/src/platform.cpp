@@ -421,4 +421,4 @@ void showErrorBox(const char* message)
     SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error", message, nullptr);
 }
 
-} // end of namespace mingine 
+} // end of namespace mingine

@@ -47,4 +47,4 @@ void presentFrameRotating();
 void stopMusic();
 void endUpdate();
 
-} // end of namespace mingine 
+} // end of namespace mingine
