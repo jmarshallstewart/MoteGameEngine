@@ -30,15 +30,13 @@
 *.exe
 *.out
 *.app
-.vs/Mingine/v14/.suo
 Debug/
 packages/
-Mingine/Mingine.vcxproj.user
-Mingine/assets/scripts/myProjects/
-Mingine/Release/
+Mote/Release/
 Release/
-Mingine/assets/scripts/privateProjects/
-*mingine_Run
+Mote/assets/scripts/myProjects/
+Mote/assets/scripts/privateProjects/
+*Mote_Run
 
 # Visual Studio files
 *.tlog
@@ -49,6 +47,8 @@ Mingine/assets/scripts/privateProjects/
 *.idb
 *.db
 *.opendb
+*.suo
+*.vcxproj.user
+.vs/*
 packages/
 
-\.vs/Mingine/v15/\.suo
