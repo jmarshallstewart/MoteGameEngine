@@ -48,19 +48,20 @@ void box2dDebugDraw::DrawCircle(const b2Vec2& center, float32 radius, const b2Co
 
 void box2dDebugDraw::DrawSolidCircle(const b2Vec2& center, float32 radius, const b2Vec2& axis, const b2Color& color)
 {
-	// for now, ignore the requested for a solid fill...
+	// for now, ignore the request for a solid fill...
 	DrawCircle(center, radius, color);
-
-	int x1, y1, x2, y2;
-	camera.transformVec2(center, x1, y1);
-	camera.transformVec2(center + radius * axis, x2, y2);
-
-	drawLine(x1, y1, x2, y2);
+	DrawSegment(center, center + radius * axis, color);
 }
 
 void box2dDebugDraw::DrawSegment(const b2Vec2& p1, const b2Vec2& p2, const b2Color& color)
 {
-	throw std::logic_error("Not implemented.");
+	SetDrawColor(color);
+
+	int x1, y1, x2, y2;
+	camera.transformVec2(p1, x1, y1);
+	camera.transformVec2(p2, x2, y2);
+
+	drawLine(x1, y1, x2, y2);
 }
 
 //@TODO: For now, just draw transform as a point.
