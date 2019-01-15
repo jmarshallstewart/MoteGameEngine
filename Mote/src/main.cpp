@@ -20,10 +20,7 @@ using namespace mote;
 const int FPS = 60;
 const int FRAME_TIME_NS = (1000 / FPS) * 1000 * 1000;
 
-// swap the following two lines if you want to ignore
-// lua features and write your code natively.
-//const char * const CONFIG_FILE = "assets/scripts/core/noop.lua";
-const char * const CONFIG_FILE = "config.lua";
+const char* startScript{ "config.lua" };
 
 namespace mote {
     extern const int NUM_SDL_SCANCODES = 512;
@@ -562,8 +559,12 @@ int main(int argc, char* argv[])
     lua_register(luaState, "GetFrameTime", GetFrameTime);
     lua_register(luaState, "SetAssetBasePath", SetAssetBasePath);
     lua_register(luaState, "LoadTmxFile", LoadTmxFile);
-        
-    runScript(luaState, CONFIG_FILE);
+       
+	if (startScript != nullptr)
+	{
+		runScript(luaState, startScript);
+	}
+    
     call(luaState, "Start");
     Start();
         
