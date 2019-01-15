@@ -563,9 +563,9 @@ int main(int argc, char* argv[])
 	if (startScript != nullptr)
 	{
 		runScript(luaState, startScript);
+		call(luaState, "Start");
 	}
     
-    call(luaState, "Start");
     Start();
         
     // after http://gameprogrammingpatterns.com/game-loop.html
@@ -585,7 +585,12 @@ int main(int argc, char* argv[])
         if (behind >= FRAME_TIME_NS)
         {
             updateInput(&mouseX, &mouseY);
-            call(luaState, "Update");
+            
+			if (startScript != nullptr)
+			{
+				call(luaState, "Update");
+			}
+
             Update();
             endUpdate();
 
@@ -593,7 +598,12 @@ int main(int argc, char* argv[])
         }
         
         beginFrame();
-        call(luaState, "Draw");
+
+		if (startScript != nullptr)
+		{
+			call(luaState, "Draw");
+		}
+
         Draw();
         presentFrame();
         //presentFrameRotating();
