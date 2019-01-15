@@ -359,7 +359,7 @@ namespace mote {
             XMLElement* pImageElement = pTilesetElement->FirstChildElement("image");
             const char* source = pImageElement->Attribute("source");
             string s = string(source);
-            int index = s.find(topPathToMatch);
+            int index = (int)s.find(topPathToMatch);
             mapData.tileSetPath = &source[index];
 
             snprintf(stringBuilderBuffer, sizeof(stringBuilderBuffer), "Tile atlas source: %s", mapData.tileSetPath);
@@ -390,7 +390,7 @@ namespace mote {
 
             stringstream ss(pDataElement->GetText());
 
-            int numLayers = mapData.tiles.size();
+            int numLayers = (int)mapData.tiles.size();
             vector<int> v;
             mapData.tiles.push_back(v);
 
