@@ -89,6 +89,16 @@ void Image::drawFrame(int x, int y, int frameWidth, int frameHeight, int frame, 
     SDL_RenderCopyEx(renderer, (SDL_Texture*)assetData, &sourceRect, &destRect, angle, nullptr, SDL_FLIP_NONE);
 }
 
+int Image::getWidth() const
+{
+	return width;
+}
+
+int Image::getHeight() const
+{
+	return height;
+}
+
 bool Font::load(const LoadParameters& loadParameters)
 {
     assetData = TTF_OpenFont(loadParameters.path, loadParameters.size);

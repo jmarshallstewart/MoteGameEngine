@@ -45,6 +45,8 @@ public:
     void free() override;
     void draw(int x, int y, double angle, double scale, uint8_t r, uint8_t g, uint8_t b);
     void drawFrame(int x, int y, int frameWidth, int frameHeight, int frame, double angle, double scale, uint8_t r, uint8_t g, uint8_t b);
+	int getWidth() const;
+	int getHeight() const;
 
 private:
     int width{ 0 };
