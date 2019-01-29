@@ -368,3 +368,17 @@ LoadTmxFile(string pathToTmxFile)
     4. Look at that file. This is a lua script. It may be just what you need,
     but you will probably want to change it. To do this, you will need to
     modify Mote from source.
+	
+GetImageWidth(reference imageAsset)
+	imageAsset: a reference to an asset loaded via LoadImage().
+	
+	returns: int (width of the image in pixels)
+	
+	Returns the width of the image measured in pixels.
+	
+GetImageHeight(reference imageAsset)
+	imageAsset: a reference to an asset loaded via LoadImage().
+	
+	returns: int (height of the image in pixels)
+	
+	Returns the height of the image measured in pixels.

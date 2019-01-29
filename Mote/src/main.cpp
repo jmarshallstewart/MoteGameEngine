@@ -476,6 +476,44 @@ int GetFrameTime(lua_State* state)
     return 1;
 }
 
+int GetImageWidth(lua_State* state)
+{
+	int id = (int)lua_tonumber(state, 1);
+	Image* image = assetDatabase.get<Image>(id);
+
+	assert(image != nullptr);
+
+	int width = 0;
+
+	if (image != nullptr)
+	{
+		width = image->getWidth();
+	}
+
+	lua_pushnumber(state, width);
+
+	return 1;
+}
+
+int GetImageHeight(lua_State* state)
+{
+	int id = (int)lua_tonumber(state, 1);
+	Image* image = assetDatabase.get<Image>(id);
+
+	assert(image != nullptr);
+
+	int height = 0;
+
+	if (image != nullptr)
+	{
+		height = image->getHeight();
+	}
+
+	lua_pushnumber(state, height);
+
+	return 1;
+}
+
 int ClearScreen(lua_State* state)
 {
     uint8_t r = (uint8_t)lua_tointeger(state, 1);
@@ -559,6 +597,8 @@ int main(int argc, char* argv[])
     lua_register(luaState, "GetFrameTime", GetFrameTime);
     lua_register(luaState, "SetAssetBasePath", SetAssetBasePath);
     lua_register(luaState, "LoadTmxFile", LoadTmxFile);
+	lua_register(luaState, "GetImageWidth", GetImageWidth);
+	lua_register(luaState, "GetImageHeight", GetImageHeight);
        
 	if (startScript != nullptr)
 	{

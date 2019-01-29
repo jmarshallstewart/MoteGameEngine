@@ -4,15 +4,18 @@ function Start()
     CreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT)
     SetWindowTitle("Basic Walking")
 
+    ground = {}
+    ground.image = LoadImage("images/gme/ground.png")
+    ground.width = GetImageWidth(ground.image)
+    ground.height = GetImageHeight(ground.image)
+    
     player = {}
     player.image = LoadImage("images/gme/player.png")
-    player.x = SCREEN_WIDTH / 2 - 16
-    player.y = SCREEN_HEIGHT - 64
+    player.width = GetImageWidth(player.image)
+    player.height = GetImageHeight(player.image)
+    player.x = SCREEN_WIDTH / 2 - player.width / 2
+    player.y = SCREEN_HEIGHT - ground.height - player.height
     player.speed = 8
-        
-    ground = LoadImage("images/gme/ground.png")
-        
-    tileSize = 32
 end
 
 function Update()
@@ -28,8 +31,8 @@ function Update()
         player.x = 0
     end
     
-    if player.x > SCREEN_WIDTH - tileSize then
-        player.x = SCREEN_WIDTH - tileSize
+    if player.x > SCREEN_WIDTH - player.width then
+        player.x = SCREEN_WIDTH - player.width
     end
 end
 
@@ -40,7 +43,7 @@ function Draw()
     
     local x = 0
     while x < SCREEN_WIDTH do
-        DrawImage(ground, x, SCREEN_HEIGHT - tileSize)
-        x = x + tileSize
+        DrawImage(ground.image, x, SCREEN_HEIGHT - ground.height)
+        x = x + ground.width
     end
 end
