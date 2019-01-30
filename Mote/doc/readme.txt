@@ -14,6 +14,11 @@ http://gamemechanicexplorer.com
 Uses 2D art by Eris, licensed under the CC0 license.
 https://opengameart.org/users/eris
 
+Parallax Layers by Ansimuz
+https://ansimuz.itch.io/mountain-dusk-parallax-background
+full text of license for Parallax Layers is available at:
+https://creativecommons.org/licenses/by/4.0/
+
 Music by Juhani Junkala
 https://www.youtube.com/watch?v=dbACpSy9FWY
 juhani.junkala@musician.org
