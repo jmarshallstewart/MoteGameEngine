@@ -12,7 +12,7 @@ splashState.prevDownButton7 = 0
 splashState.blinkDelay = 500
 splashState.blinkTimer = splashState.blinkDelay
 splashState.blink = true
-splashState.prevDownButton7 = 0
+splashState.prevDownButton7 = false
 splashState.music = nil
 
 ------------------------------------------------------------------------------
@@ -36,12 +36,12 @@ function SplashState_Update()
         end
     end
     
-    if (splashState.prevDownButton7 == 0 and controller_0_button_7 == 1) or IsKeyPressed(SDL_SCANCODE_SPACE) then
+    if (not splashState.prevDownButton7 and ReadControllerButton(0, 7)) or IsKeyPressed(SDL_SCANCODE_SPACE) then
         ResetStats()
         GotoState(GAME_STATE)
     end
     
-    splashState.prevDownButton7 = controller_0_button_7
+    splashState.prevDownButton7 = ReadControllerButton(0, 7)
 end
 
 function SplashState_Draw()
@@ -50,6 +50,10 @@ function SplashState_Draw()
     DrawText(splashState.titleText, (SCREEN_WIDTH / 2) - ((splashState.titleTextLength * splashState.bigFontSize) / 2), SCREEN_HEIGHT / 3, splashState.bigFont, 255, 255, 255);
     
     if splashState.blink then
-        DrawText(splashState.hintText, (SCREEN_WIDTH / 2) - ((splashState.hintTextLength * splashState.fontSize) / 2), math.floor(SCREEN_HEIGHT * 0.83), splashState.font, 255, 255, 255);
+		if IsControllerAttached(0) then
+        DrawText(splashState.hintText, (SCREEN_WIDTH / 2) - ((splashState.hintTextLength * splashState.fontSize) / 2), math.floor(SCREEN_HEIGHT * 0.83), splashState.font, 255, 255, 255)
+		else
+		DrawText("Please attach a controller", (SCREEN_WIDTH / 2) - ((splashState.hintTextLength * splashState.fontSize) / 2), math.floor(SCREEN_HEIGHT * 0.83), splashState.font, 255, 255, 255)
+		end
     end
 end

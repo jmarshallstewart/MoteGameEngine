@@ -6,7 +6,7 @@ defeatState.titleText = "GAME OVER"
 defeatState.titleTextLength = string.len(defeatState.titleText)
 defeatState.fontSize = 20
 defeatState.bigFontSize = 120
-defeatState.prevDownButton7 = 0
+defeatState.prevDownButton7 = false
 defeatState.stats = {}
 defeatState.music = nil
 defeatState.reason = nil
@@ -24,7 +24,7 @@ end
 function DefeatState_Start()
    defeatState.bigFont = LoadFont("fonts/8_bit_pusab.ttf", defeatState.bigFontSize)
    defeatState.font = LoadFont("fonts/8_bit_pusab.ttf", defeatState.fontSize)
-   defeatState.prevDownButton7 = controller_0_button_7
+   defeatState.prevDownButton7 = ReadControllerButton(0, 7)
    defeatState.music = LoadMusic("music/ending.ogg")
    PlayMusic(defeatState.music)
 end
@@ -32,11 +32,11 @@ end
 function DefeatState_Update()
     ClearTable(defeatState.stats)
 
-    if (defeatState.prevDownButton7 == 0 and controller_0_button_7 == 1) or IsKeyPressed(SDL_SCANCODE_SPACE) then
+    if (defeatState.prevDownButton7 and ReadControllerButton(0, 7)) or IsKeyPressed(SDL_SCANCODE_SPACE) then
         GotoState(SPLASH_STATE)
     end
     
-    defeatState.prevDownButton7 = controller_0_button_7
+    defeatState.prevDownButton7 = ReadControllerButton(0, 7)
     
     local hitPercentage = 0
     if stats.bulletsFired > 0 then

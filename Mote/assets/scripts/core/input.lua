@@ -1,25 +1,3 @@
-function getMoveInput()
-    local x = GetInputX()
-    local y = GetInputY()
-    
-    if x == 0 and y == 0 then
-        return 0, 0
-    end
-    
-    return Normalize(x, y)
-end
-
-function getLookInput()
-    local x = controller_0_axis_3 / 32768
-    local y = controller_0_axis_4 / 32768
-    
-    if x == 0 and y == 0 then
-        return 0, 0
-    end
-    
-    return Normalize(x, y)
-end
-
 function GetInputX(playerId)
 	--check keyboard input first
 	if IsKeyDown(SDL_SCANCODE_LEFT) then return -1.0
@@ -58,3 +36,26 @@ function GetInputY(playerId)
     
     return 0.0
 end
+
+function GetMoveInput(playerId)
+    local x = GetInputX(playerId)
+    local y = GetInputY(playerId)
+    
+    if x == 0 and y == 0 then
+        return 0, 0
+    end
+    
+    return Normalize(x, y)
+end
+
+function GetLookInput(playerId)
+    local x = ReadControllerAxis(playerId, 3)
+    local y = ReadControllerAxis(playerId, 4)
+    
+    if x == 0 and y == 0 then
+        return 0, 0
+    end
+    
+    return Normalize(x, y)
+end
+

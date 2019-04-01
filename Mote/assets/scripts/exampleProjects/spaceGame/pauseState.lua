@@ -6,7 +6,7 @@ pauseState.titleText = "Paused"
 pauseState.titleTextLength = string.len(pauseState.titleText)
 pauseState.fontSize = 20
 pauseState.bigFontSize = 120
-pauseState.prevDownButton7 = 0
+pauseState.prevDownButton7 = false
 pauseState.stats = {}
 
 ------------------------------------------------------------------------------
@@ -22,17 +22,17 @@ end
 function PauseState_Start()
    pauseState.bigFont = LoadFont("fonts/8_bit_pusab.ttf", pauseState.bigFontSize)
    pauseState.font = LoadFont("fonts/8_bit_pusab.ttf", pauseState.fontSize)
-   pauseState.prevDownButton7 = controller_0_button_7
+   pauseState.prevDownButton7 = ReadControllerButton(0, 7)
 end
 
 function PauseState_Update()
     ClearTable(pauseState.stats)
 
-    if (pauseState.prevDownButton7 == 0 and controller_0_button_7 == 1) or IsKeyPressed(SDL_SCANCODE_SPACE) then
+    if (not pauseState.prevDownButton7 and ReadControllerButton(0, 7)) or IsKeyPressed(SDL_SCANCODE_SPACE) then
         GotoState(GAME_STATE)
     end
     
-    pauseState.prevDownButton7 = controller_0_button_7
+    pauseState.prevDownButton7 = ReadControllerButton(0, 7)
     
     local hitPercentage = 0
     if stats.bulletsFired > 0 then

@@ -50,7 +50,7 @@ gameState.fontSize = 20
 gameState.font = nil
 gameState.playTime = 0
 gameState.music = nil
-gameState.prevDownButton7 = 0
+gameState.prevDownButton7 = false
 
 ------------------------------------------------------------------------------
 -- helper functions
@@ -464,7 +464,7 @@ function UpdatePlayerMovement()
     local x = 0
     local y = 0
     
-    x, y = getMoveInput()
+    x, y = GetMoveInput(0)
     
     player.acceleration.x = x * player.speed
     player.acceleration.y = y * player.speed 
@@ -477,7 +477,7 @@ function UpdatePlayerAim()
     local aimX = 0
     local aimY = 0
     
-    aimX, aimY = getLookInput()
+    aimX, aimY = GetLookInput(0)
     
     if MagnitudeSquared(aimX, aimY) > 0 then
         player.angle = math.deg(math.atan(aimY, aimX)) 
@@ -633,7 +633,7 @@ function GameState_Start()
         gameState.tutorialTimer = gameState.initialTutorialTimer
     end
     
-    gameState.prevDownButton7 = controller_0_button_7
+    gameState.prevDownButton7 = ReadControllerButton(0, 7)
 end
 
 function GameState_Update()
@@ -653,13 +653,13 @@ function GameState_Update()
         end
     end
 
-    if (gameState.prevDownButton7 == 0 and controller_0_button_7 == 1) then
-        gameState.prevDownButton7 = controller_0_button_7
+    if (not gameState.prevDownButton7 and ReadControllerButton(0, 7)) then
+        gameState.prevDownButton7 = ReadControllerButton(0, 7)
         GotoState(PAUSE_STATE)
         return
     end
     
-    gameState.prevDownButton7 = controller_0_button_7
+    gameState.prevDownButton7 = ReadControllerButton(0, 7)
 
     if player.shieldRechargeTimer > 0 then
         player.shieldRechargeTimer = player.shieldRechargeTimer - GetFrameTime()
