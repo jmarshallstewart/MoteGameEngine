@@ -425,23 +425,23 @@ int GetMousePosition(lua_State* state)
 
 int IsControllerAttached(lua_State* state)
 {
-	int controllerId = (int)lua_tointeger(state, 1);
-	lua_pushboolean(state, isControllerAttached(controllerId));
+	int playerId = (int)lua_tointeger(state, 1);
+	lua_pushboolean(state, isControllerAttached(playerId));
 	return 1;
 }
 
 int ReadControllerButton(lua_State* state)
 {
-	int controllerId = (int)lua_tointeger(state, 1);
+	int playerId = (int)lua_tointeger(state, 1);
 	int buttonId = (int)lua_tointeger(state, 2);
-	lua_pushboolean(state, readControllerButton(controllerId, buttonId));
+	lua_pushboolean(state, readControllerButton(playerId, buttonId));
 	return 1;
 }
 
 int ReadControllerHat(lua_State* state)
 {
-	int controllerId = (int)lua_tointeger(state, 1);
-	lua_pushinteger(state, readControllerHat(controllerId));
+	int playerId = (int)lua_tointeger(state, 1);
+	lua_pushinteger(state, readControllerHat(playerId));
 	return 1;
 }
 

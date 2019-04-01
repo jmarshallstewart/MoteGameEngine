@@ -287,7 +287,7 @@ namespace mote {
 				controllers[playerId].button[event.jbutton.button] = false;
 				break;
 			case SDL_JOYHATMOTION:
-				playerId = event.jhat.which;
+				playerId = joystickIdToPlayerId[event.jhat.which];
 				controllers[playerId].hat = event.jhat.value;
 				break;
 			case SDL_JOYDEVICEADDED:

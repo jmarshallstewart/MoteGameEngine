@@ -19,6 +19,8 @@ SETTLE_TOLERANCE = 0.11 -- higher number indicates max penetration for player to
 
 DEFAULT_PLAYER_START = {x = 1, y = 1}
 
+playerId = 0
+
 -- counts the number of times Update() has been called. Used only for animating the alpha on the treasures.
 frame = 0
 
@@ -112,11 +114,11 @@ function UpdatePlayerInput()
     player.right = false
     player.jump = false
 
-    local moveX = GetInputX()
+    local moveX = GetInputX(playerId)
         
     if IsKeyDown(SDL_SCANCODE_LEFT) or (moveX < 0) == true then player.left = true end
     if IsKeyDown(SDL_SCANCODE_RIGHT) or (moveX > 0) == true then player.right = true end
-    if IsKeyDown(SDL_SCANCODE_SPACE)  or (controller_0_button_0 == 1) then player.jump = true end
+    if IsKeyDown(SDL_SCANCODE_SPACE)  or (ReadControllerButton(playerId, 0)) then player.jump = true end
 end
 
 --updates the physics of actors such as the player and enemies.
