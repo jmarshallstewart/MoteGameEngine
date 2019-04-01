@@ -12,30 +12,44 @@ MODE_PLAY = 0
 MODE_INPUT_CONFIG = 1
 
 --states
-STATE_IDLE = 0
-STATE_WALKING = 1
-STATE_RUNNING = 2
-STATE_CROUCHING = 3
-STATE_JUMPING = 4
-
-gameMode = MODE_PLAY
-images = {}
+STATE_WALKING = 0
+STATE_RUNNING = 1
+STATE_CROUCHING = 2
+STATE_JUMPING = 3
 
 BULLET_SPEED = 10
 SHOTS_PER_SECOND = 8
 MS_PER_SHOT = 1000 / SHOTS_PER_SECOND
 
-fireTimer = 0
-bullets = {}
+CROUCH_SPEED_MULTIPLIER = 0.1
+RUN_SPEED_MULTIPLIER = 3.0
 
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
-CROUCH_SPEED_MULTIPLIER = 0.2
-RUN_SPEED_MULTIPLIER = 3.0
+------------------------------------------------------------------------------
+-- global data
+------------------------------------------------------------------------------
+
+gameMode = MODE_PLAY
+images = {}
+
+fireDirection = 1
+fireTimer = 0
+bullets = {}
+
+requests = {}
+requests.fire = false
+requests.run = false
+requests.crouch = false
+requests.jump = false
+
+------------------------------------------------------------------------------
+-- helper functions
+------------------------------------------------------------------------------
 
 function LoadAssets()
-	font = LoadFont("fonts/8_bit_pusab.ttf", 24)
+	font = LoadFont("fonts/8_bit_pusab.ttf", 16)
 	
 	images.idle = LoadImage("images/tiles32/idle.png")
 	images.left = LoadImage("images/tiles32/left.png")
@@ -50,13 +64,9 @@ function Fire()
     
     bullet = {}
 	bullet.image = images.fireball
-    bullet.x = player.x + TILE_SIZE / 2
-    bullet.y = player.y + TILE_SIZE / 4
-    bullet.xVel = BULLET_SPEED
-	
-	if player.xVel < 0 then
-		bullet.xVel = -bullet.xVel
-	end
+    bullet.x = player.x + TILE_SIZE / 2 - GetImageWidth(bullet.image) / 2
+    bullet.y = player.y + TILE_SIZE / 4 - GetImageHeight(bullet.image) / 2
+    bullet.xVel = BULLET_SPEED * fireDirection
     
     bullets[#bullets + 1] = bullet
 end
@@ -68,11 +78,7 @@ function UpdateBullets()
             fireTimer = 0
         end
     end
-	
-    if fireTimer == 0 and ReadControllerButton(0, 1) then
-        Fire()
-    end
-		
+	    		
     for i = #bullets, 1, -1 do
         bullets[i].x = bullets[i].x + bullets[i].xVel
 		
@@ -83,17 +89,17 @@ function UpdateBullets()
             table.remove(bullets, i)
 		elseif bullets[i].x < -w then
 			table.remove(bullets, i)
-		--elseif bullets[i].y > SCREEN_HEIGHT + h then
-        --    table.remove(bullets, i)
-		--elseif bullets[i].y < -h then
-		--	table.remove(bullets, i)
+		elseif bullets[i].y > SCREEN_HEIGHT + h then
+            table.remove(bullets, i)
+		elseif bullets[i].y < -h then
+			table.remove(bullets, i)
         end
     end
 end
 
 function InitPlayer()
 	player = {}
-	player.state = STATE_IDLE
+	player.state = STATE_WALKING
     player.image = images.idle
     player.x = SCREEN_WIDTH / 2 - GetImageWidth(images.idle) / 2
     player.y = GROUND_HEIGHT - GetImageHeight(images.idle)
@@ -109,7 +115,21 @@ function InitPlayer()
 end
 
 function UpdatePlayer()
-	if ReadControllerButton(0, 0) and player.state ~= STATE_JUMPING then
+	requests.jump = ReadControllerButton(0, 0)
+	requests.fire = ReadControllerButton(0, 1)
+	requests.crouch = ReadControllerButton(0, 2)
+	requests.run = ReadControllerButton(0, 3)
+
+	--only switch fire directions if player moves
+	if math.abs(player.xVel) > 0 then
+		if player.xVel < 0 then
+			fireDirection = -1
+		else
+			fireDirection = 1
+		end
+	end
+	
+	if requests.jump and player.state ~= STATE_JUMPING then
         player.yVel = -player.jumpImpulse
         player.state = STATE_JUMPING
     end
@@ -121,6 +141,10 @@ function UpdatePlayer()
 		
 		if axis0 < 0 then
 			player.xAcc = -player.xAcc
+		end
+		
+		if player.state == STATE_RUNNING then
+			player.xAcc = player.xAcc * RUN_SPEED_MULTIPLIER
 		end
 	else
 		player.xAcc = 0
@@ -142,8 +166,18 @@ function UpdatePlayer()
     player.y = player.y + player.yVel
    
     -- clamp max x velocity
-    if player.xVel > player.maxSpeed then
-        player.xVel = player.maxSpeed
+	local maxSpeed = player.maxSpeed
+	
+	if player.state == STATE_CROUCHING then
+		maxSpeed = maxSpeed * CROUCH_SPEED_MULTIPLIER
+	elseif player.state == STATE_RUNNING then
+		maxSpeed = maxSpeed * RUN_SPEED_MULTIPLIER
+	end
+	
+    if player.xVel > maxSpeed then
+        player.xVel = maxSpeed
+	elseif player.xVel < -maxSpeed then
+		player.xVel = -maxSpeed
     end
    
     -- apply drag
@@ -164,8 +198,34 @@ function UpdatePlayer()
         player.y = GROUND_HEIGHT - TILE_SIZE
         player.yVel = 0
         player.yAcc = 0
-        player.state = STATE_IDLE
+        player.state = STATE_WALKING
     end
+	
+	if player.state ~= STATE_JUMPING and requests.run then
+		player.state = STATE_RUNNING
+	end
+	
+	if player.state == STATE_RUNNING and not requests.run then
+		player.state = STATE_WALKING
+	end
+	
+	if player.state ~= STATE_JUMPING and requests.crouch then
+		player.state = STATE_CROUCHING
+	end
+	
+	if player.state == STATE_CROUCHING and not requests.crouch then
+		player.state = STATE_WALKING
+	end
+	
+	if fireTimer == 0 and requests.fire then
+        Fire()
+    end
+	
+	--clear input signals
+	requests.fire = false
+	requests.run = false
+	requests.crouch = false
+	requests.jump = false
 end
 
 function DrawHud()
@@ -173,14 +233,13 @@ function DrawHud()
 	if not IsControllerAttached(0) then
 		DrawText("Please attach a controller.", 16, 16, font, 255, 255, 255)
 	else
-		DrawText("Speed: " .. player.speed, 16, 16, font, 255, 255, 255)
-		DrawText("Num bullets: " .. #bullets, 16, 48, font, 255, 255, 255)
+		DrawText("Press start to configure controls.", 16, 16, font, 255, 255, 255)
 	end
 end
 
 function DrawBullets()
 	for i = 1, #bullets do
-		DrawImage(bullets[i].image, bullets[i].x, bullets[i].y)
+		DrawImage(bullets[i].image, bullets[i].x, bullets[i].y, 0, 4.0)
 	end
 end
 
@@ -190,7 +249,9 @@ function DrawPlayer()
 	if player.state == STATE_CROUCHING then
 		playerImage = images.crouch
 	elseif player.state == STATE_RUNNING then
-		if player.xVel > 0 then
+		if player.xVel == 0 then
+			playerImage = images.idle
+		elseif player.xVel > 0 then
 			playerImage = images.right
 		else
 			playerImage = images.left
@@ -210,7 +271,10 @@ function DrawGround()
     end
 end
 
--- called once, at the start of the game
+------------------------------------------------------------------------------
+-- core functions
+------------------------------------------------------------------------------
+
 function Start()
     CreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT)
     SetWindowTitle("Button Remapping Demo")
@@ -228,7 +292,6 @@ function Update()
 	UpdatePlayer()
 end
 
--- called for each new frame drawn to the screen.
 function Draw()
 	ClearScreen(68, 136, 204)
 	DrawHud()
@@ -236,11 +299,3 @@ function Draw()
 	DrawPlayer()
 	DrawGround()
 end
-
---TO DO:
---1. implement crouch
---2. implement run
---3. draw the correct state
---4. pressing start changes game modes
---5. be able to remap commands
---6. implement ui for remapping commands

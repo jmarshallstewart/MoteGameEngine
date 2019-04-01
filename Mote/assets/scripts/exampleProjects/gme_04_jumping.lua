@@ -57,6 +57,8 @@ function Update()
     -- clamp max x velocity
     if player.xVel > player.maxSpeed then
         player.xVel = player.maxSpeed
+	elseif player.xVel < -player.maxSpeed then
+		player.xVel = -player.maxSpeed
     end
    
     -- apply drag
