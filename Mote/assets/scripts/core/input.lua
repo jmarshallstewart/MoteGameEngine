@@ -9,8 +9,7 @@ function GetInputX(playerId)
 
 	local hat = ReadControllerHat(playerId)
 	local axis_0 = ReadControllerAxis(playerId, 0)
-	Log("Hat: " .. hat)
-	
+		
     if hat == 8 then return -1.0
     elseif hat == 2 then return 1.0
     elseif math.abs(axis_0) > 0 then return axis_0 end
