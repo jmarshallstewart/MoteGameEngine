@@ -49,12 +49,6 @@ void printError(lua_State* state)
     lua_pop(state, 1); // remove error message from top of stack
 }
 
-void setGlobal(const char* globalName, int value)
-{
-    lua_pushinteger(luaState, value);
-    lua_setglobal(luaState, globalName);
-}
-
 void runScript(lua_State* state, const char* file)
 {
     int result = luaL_loadfile(state, file);
@@ -429,6 +423,36 @@ int GetMousePosition(lua_State* state)
     return 2;
 }
 
+int IsControllerAttached(lua_State* state)
+{
+	int controllerId = (int)lua_tointeger(state, 1);
+	lua_pushboolean(state, isControllerAttached(controllerId));
+	return 1;
+}
+
+int ReadControllerButton(lua_State* state)
+{
+	int controllerId = (int)lua_tointeger(state, 1);
+	int buttonId = (int)lua_tointeger(state, 2);
+	lua_pushboolean(state, readControllerButton(controllerId, buttonId));
+	return 1;
+}
+
+int ReadControllerHat(lua_State* state)
+{
+	int controllerId = (int)lua_tointeger(state, 1);
+	lua_pushinteger(state, readControllerHat(controllerId));
+	return 1;
+}
+
+int ReadControllerAxis(lua_State* state)
+{
+	int controllerId = (int)lua_tointeger(state, 1);
+	int axisId = (int)lua_tointeger(state, 2);
+	lua_pushnumber(state, readControllerAxis(controllerId, axisId));
+	return 1;
+}
+
 int SetWindowTitle(lua_State* state)
 {
     const char* title = lua_tostring(state, 1);
@@ -599,6 +623,10 @@ int main(int argc, char* argv[])
     lua_register(luaState, "LoadTmxFile", LoadTmxFile);
 	lua_register(luaState, "GetImageWidth", GetImageWidth);
 	lua_register(luaState, "GetImageHeight", GetImageHeight);
+	lua_register(luaState, "IsControllerAttached", IsControllerAttached);
+	lua_register(luaState, "ReadControllerButton", ReadControllerButton);
+	lua_register(luaState, "ReadControllerHat", ReadControllerHat);
+	lua_register(luaState, "ReadControllerAxis", ReadControllerAxis);
        
 	if (startScript != nullptr)
 	{
@@ -613,7 +641,7 @@ int main(int argc, char* argv[])
     auto previousTime = high_resolution_clock::now();
     long long behind = 0;
 
-    while (pollEvents(setGlobal) && !quit)
+    while (pollEvents() && !quit)
     {
         auto currentTime = high_resolution_clock::now();
         auto delta = duration_cast<nanoseconds>(currentTime - previousTime);

@@ -17,32 +17,33 @@ end
 function Update()
 end
 
+--helper function to reduce redundancy among frequent DrawText() calls.
+function ShowText(text, x, y)
+	DrawText(text, x, y, font, 255, 255, 255);
+end
+
 function Draw()
     ClearScreen(68, 136, 204)
     
     local spacing = 35
     local xOffset = 8
-    local axisOffset = xOffset + 250
+    local axisOffset = xOffset + 350
     local buttonOffset = xOffset
     local yOffset = 9
-    
-    DrawText("Axis 0: " .. controller_0_axis_0 / 32768, axisOffset, yOffset, font, 255, 255, 255);
-    DrawText("Axis 1: " .. controller_0_axis_1 / 32768, axisOffset, yOffset + spacing, font, 255, 255, 255);
-    DrawText("Axis 2: " .. controller_0_axis_2 / 32768, axisOffset, yOffset + spacing * 2, font, 255, 255, 255);
-    DrawText("Axis 3: " .. controller_0_axis_3 / 32768, axisOffset, yOffset + spacing * 3, font, 255, 255, 255);
-    DrawText("Axis 4: " .. controller_0_axis_4 / 32768, axisOffset, yOffset + spacing * 4, font, 255, 255, 255);
-    DrawText("Axis 5: " .. controller_0_axis_5 / 32768, axisOffset, yOffset + spacing * 5, font, 255, 255, 255);
-    
-    DrawText("Button 0: " .. controller_0_button_0, buttonOffset, yOffset + spacing * 0, font, 255, 255, 255);
-    DrawText("Button 1: " .. controller_0_button_1, buttonOffset, yOffset + spacing * 1, font, 255, 255, 255);
-    DrawText("Button 2: " .. controller_0_button_2, buttonOffset, yOffset + spacing * 2, font, 255, 255, 255);
-    DrawText("Button 3: " .. controller_0_button_3, buttonOffset, yOffset + spacing * 3, font, 255, 255, 255);
-    DrawText("Button 4: " .. controller_0_button_4, buttonOffset, yOffset + spacing * 4, font, 255, 255, 255);
-    DrawText("Button 5: " .. controller_0_button_5, buttonOffset, yOffset + spacing * 5, font, 255, 255, 255);
-    DrawText("Button 6: " .. controller_0_button_6, buttonOffset, yOffset + spacing * 6, font, 255, 255, 255);
-    DrawText("Button 7: " .. controller_0_button_7, buttonOffset, yOffset + spacing * 7, font, 255, 255, 255);
-    DrawText("Button 8: " .. controller_0_button_8, buttonOffset, yOffset + spacing * 8, font, 255, 255, 255);
-    DrawText("Button 9: " .. controller_0_button_9, buttonOffset, yOffset + spacing * 9, font, 255, 255, 255);
-        
-    DrawText("Hat: " .. controller_0_hat, buttonOffset, yOffset + spacing * 12, font, 255, 255, 255);
+	
+	if IsControllerAttached(0) then
+		for i = 0,5 do
+			local axisValue = ReadControllerAxis(0, i)
+			ShowText("Axis " .. i .. ": " .. string.format("%.3f", axisValue), axisOffset, yOffset + spacing * i)
+		end
+	
+		for i = 0,9 do
+			local isDown = ReadControllerButton(0, i)
+			ShowText("Button " .. i .. ": " .. BoolToString(isDown), buttonOffset, yOffset + spacing * i)
+		end		
+		
+		ShowText("Hat: " .. ReadControllerHat(0), buttonOffset, yOffset + spacing * 12)
+    else
+		ShowText("Please attach a controller for player 1.", xOffset, yOffset)
+	end
 end
