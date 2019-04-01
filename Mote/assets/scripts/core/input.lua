@@ -1,5 +1,12 @@
 controller_0_attached = 0 -- 1 == true
 
+controller_0_axis_0 = 0
+controller_0_axis_1 = 0
+controller_0_axis_2 = 0
+controller_0_axis_3 = 0
+controller_0_axis_4 = 0
+controller_0_axis_5 = 0
+
 controller_0_button_0 = 0
 controller_0_button_1 = 0
 controller_0_button_2 = 0
@@ -10,7 +17,6 @@ controller_0_button_6 = 0
 controller_0_button_7 = 0
 controller_0_button_8 = 0
 controller_0_button_9 = 0
-controller_0_button_10 = 0
 
 controller_0_hat = 0
 

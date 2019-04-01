@@ -5,29 +5,6 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
 ------------------------------------------------------------------------------
--- transient data
-------------------------------------------------------------------------------
-
-controller_0_button_0 = 0
-controller_0_button_1 = 0
-controller_0_button_2 = 0
-controller_0_button_3 = 0
-controller_0_button_4 = 0
-controller_0_button_5 = 0
-controller_0_button_6 = 0
-controller_0_button_7 = 0
-controller_0_button_8 = 0
-controller_0_button_9 = 0
-controller_0_button_10 = 0
-
-controller_0_hat = 0
-
-------------------------------------------------------------------------------
--- helper functions
-------------------------------------------------------------------------------
-
-
-------------------------------------------------------------------------------
 -- core functions
 ------------------------------------------------------------------------------
 function Start()
@@ -66,7 +43,6 @@ function Draw()
     DrawText("Button 7: " .. controller_0_button_7, buttonOffset, yOffset + spacing * 7, font, 255, 255, 255);
     DrawText("Button 8: " .. controller_0_button_8, buttonOffset, yOffset + spacing * 8, font, 255, 255, 255);
     DrawText("Button 9: " .. controller_0_button_9, buttonOffset, yOffset + spacing * 9, font, 255, 255, 255);
-    DrawText("Button 10: " .. controller_0_button_10, buttonOffset, yOffset + spacing * 10, font, 255, 255, 255);
-    
+        
     DrawText("Hat: " .. controller_0_hat, buttonOffset, yOffset + spacing * 12, font, 255, 255, 255);
 end

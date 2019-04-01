@@ -233,7 +233,6 @@ bool pollEvents(void (*eventHandler)(const char*, int value))
             //snprintf(stringBuilderBuffer, sizeof(stringBuilderBuffer), "hat motion: %i %i", event.jhat.which, event.jhat.value);
             //log(stringBuilderBuffer);
             break;
-            break;
         case SDL_JOYDEVICEADDED:
             acquireController(event.jdevice.which);
 			snprintf(stringBuilderBuffer, sizeof(stringBuilderBuffer), "controller_%i_attached", event.jdevice.which);
