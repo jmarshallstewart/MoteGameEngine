@@ -303,8 +303,7 @@ function UpdateLocomotionState()
 end
 
 --reset all requests. Player input may
---set some of these to true during the 
---next Update()
+--set some of these to true during the next Update()
 function ClearActionRequests()
     requests.fire = false
     requests.run = false
@@ -327,7 +326,6 @@ function UpdatePlayer()
 end
 
 function DrawHud()
-    --draw controller warning (optional)
     if not IsControllerAttached(0) then
         DrawText("Please attach a controller.", 16, 16, font, 255, 255, 255)
     else
