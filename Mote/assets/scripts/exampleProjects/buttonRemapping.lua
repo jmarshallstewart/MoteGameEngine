@@ -67,22 +67,22 @@ requests.jump = false
 
 doFire = {}
 function doFire.execute()
-	requests.fire = true
+    requests.fire = true
 end
 
 doRun = {}
 function doRun.execute()
-	requests.run = true
+    requests.run = true
 end
 
 doCrouch = {}
 function doCrouch.execute()
-	requests.crouch = true
+    requests.crouch = true
 end
 
 doJump = {}
 function doJump.execute()
-	requests.jump = true
+    requests.jump = true
 end
 
 commands = {}
@@ -96,48 +96,48 @@ commands[3] = doRun
 ------------------------------------------------------------------------------
 
 function ReadPlayerInput()
-	for i = 0, NUM_CONFIGURABLE_BUTTONS - 1 do
-		if ReadControllerButton(0, i) then
-			commands[i].execute()
-		end
-	end
+    for i = 0, NUM_CONFIGURABLE_BUTTONS - 1 do
+        if ReadControllerButton(0, i) then
+            commands[i].execute()
+        end
+    end
 end
 
 function FindButton(command)
-	for i = 0, NUM_CONFIGURABLE_BUTTONS - 1 do
-		if commands[i] == command then
-			return i
-		end
-	end
-	
-	--provides visual cue in button config
-	--menu that a command is not mapped.
-	return -1
+    for i = 0, NUM_CONFIGURABLE_BUTTONS - 1 do
+        if commands[i] == command then
+            return i
+        end
+    end
+    
+    --provides visual cue in button config
+    --menu that a command is not mapped.
+    return -1
 end
 
 --toggle between game and config menu when START button pressed.
 --(but ignore multiple requests to toggle until START button has been released.)
 function UpdatePause()
-	local startPressed = ReadControllerButton(0, START_BUTTON_ID)
-	if not startWasPressedLastUpdate and startPressed then
-		if gameMode == MODE_PLAY then gameMode = MODE_INPUT_CONFIG
-		elseif gameMode == MODE_INPUT_CONFIG then gameMode = MODE_PLAY end
-	end
-	
-	startWasPressedLastUpdate = startPressed
+    local startPressed = ReadControllerButton(0, START_BUTTON_ID)
+    if not startWasPressedLastUpdate and startPressed then
+        if gameMode == MODE_PLAY then gameMode = MODE_INPUT_CONFIG
+        elseif gameMode == MODE_INPUT_CONFIG then gameMode = MODE_PLAY end
+    end
+    
+    startWasPressedLastUpdate = startPressed
 end
 
 --Load fonts and images used in this example.
 function LoadAssets()
-	font = LoadFont("fonts/8_bit_pusab.ttf", 16)
-	bigFont = LoadFont("fonts/8_bit_pusab.ttf", 64)
-	
-	images.idle = LoadImage("images/tiles32/idle.png")
-	images.left = LoadImage("images/tiles32/left.png")
-	images.right = LoadImage("images/tiles32/right.png")
-	images.crouch = LoadImage("images/tiles32/crouch.png")
-	images.ground = LoadImage("images/tiles32/ground.png")
-	images.fireball = LoadImage("images/tiles32/fireball.png")
+    font = LoadFont("fonts/8_bit_pusab.ttf", 16)
+    bigFont = LoadFont("fonts/8_bit_pusab.ttf", 64)
+    
+    images.idle = LoadImage("images/tiles32/idle.png")
+    images.left = LoadImage("images/tiles32/left.png")
+    images.right = LoadImage("images/tiles32/right.png")
+    images.crouch = LoadImage("images/tiles32/crouch.png")
+    images.ground = LoadImage("images/tiles32/ground.png")
+    images.fireball = LoadImage("images/tiles32/fireball.png")
 end
 
 --add a new bullet to the world, originating from the player.
@@ -145,8 +145,8 @@ function Fire()
     fireTimer = fireTimer + MS_PER_SHOT
     
     bullet = {}
-	bullet.image = images.fireball
-	--adjust for size of player and size of bullet
+    bullet.image = images.fireball
+    --adjust for size of player and size of bullet
     bullet.x = player.x + TILE_SIZE / 2 - GetImageWidth(bullet.image) / 2
     bullet.y = player.y + TILE_SIZE / 4 - GetImageHeight(bullet.image) / 2
     bullet.xVel = BULLET_SPEED * fireDirection
@@ -161,27 +161,26 @@ function UpdateBullets()
             fireTimer = 0
         end
     end
-	    		
-	--move all bullets, and destroy bullets that have left the screen.			
+                
+    --move all bullets, and destroy bullets that have left the screen.          
     for i = #bullets, 1, -1 do
         bullets[i].x = bullets[i].x + bullets[i].xVel
-		
-		local w = GetImageWidth(bullets[i].image)
-		local h = GetImageHeight(bullets[i].image)
-		
-        if 	   bullets[i].x > SCREEN_WIDTH + w 
-			or bullets[i].x < -w
-			or bullets[i].y > SCREEN_HEIGHT + h
+        
+        local w = GetImageWidth(bullets[i].image)
+        local h = GetImageHeight(bullets[i].image)
+        
+        if     bullets[i].x > SCREEN_WIDTH + w 
+            or bullets[i].x < -w
+            or bullets[i].y > SCREEN_HEIGHT + h
             or bullets[i].y < -h then
-			table.remove(bullets, i)
+            table.remove(bullets, i)
         end
     end
 end
 
 function InitPlayer()
-	player = {}
-	player.state = STATE_WALKING
-    player.image = images.idle
+    player = {}
+    player.state = STATE_WALKING
     player.x = SCREEN_WIDTH / 2 - TILE_SIZE / 2
     player.y = GROUND_HEIGHT - TILE_SIZE
     player.xVel = 0
@@ -197,37 +196,37 @@ end
 
 --only switch fire directions if player moves
 function UpdatePlayerFireDirection()
-	if math.abs(player.xVel) > 0 then
-		if player.xVel < 0 then
-			fireDirection = -1
-		else
-			fireDirection = 1
-		end
-	end
+    if math.abs(player.xVel) > 0 then
+        if player.xVel < 0 then
+            fireDirection = -1
+        else
+            fireDirection = 1
+        end
+    end
 end
 
 --handles moving and jumping for the player
 function UpdatePlayerMovement()
-	if requests.jump and player.state ~= STATE_JUMPING then
+    if requests.jump and player.state ~= STATE_JUMPING then
         player.yVel = -player.jumpImpulse
         player.state = STATE_JUMPING
     end
 
-	local axis0 = GetInputX(0)
-	
-	if math.abs(axis0) > 0 then
-		player.xAcc = player.speed
-		
-		if axis0 < 0 then
-			player.xAcc = -player.xAcc
-		end
-		
-		if player.state == STATE_RUNNING then
-			player.xAcc = player.xAcc * RUN_SPEED_MULTIPLIER
-		end
-	else
-		player.xAcc = 0
-	end
+    local axis0 = GetInputX(0)
+    
+    if math.abs(axis0) > 0 then
+        player.xAcc = player.speed
+        
+        if axis0 < 0 then
+            player.xAcc = -player.xAcc
+        end
+        
+        if player.state == STATE_RUNNING then
+            player.xAcc = player.xAcc * RUN_SPEED_MULTIPLIER
+        end
+    else
+        player.xAcc = 0
+    end
     
     if player.state == STATE_JUMPING then
         player.yAcc = player.yAcc - player.gravity
@@ -241,24 +240,24 @@ function UpdatePlayerMovement()
         player.xVel = 0
     end
       
-	--update player's position based on their velocity
+    --update player's position based on their velocity
     player.x = player.x + player.xVel
     player.y = player.y + player.yVel
    
     -- adjust speed for crouching and running players.
-	local maxSpeed = player.maxSpeed
-	
-	if player.state == STATE_CROUCHING then
-		maxSpeed = maxSpeed * CROUCH_SPEED_MULTIPLIER
-	elseif player.state == STATE_RUNNING then
-		maxSpeed = maxSpeed * RUN_SPEED_MULTIPLIER
-	end
-	
-	-- clamp max x velocity
+    local maxSpeed = player.maxSpeed
+    
+    if player.state == STATE_CROUCHING then
+        maxSpeed = maxSpeed * CROUCH_SPEED_MULTIPLIER
+    elseif player.state == STATE_RUNNING then
+        maxSpeed = maxSpeed * RUN_SPEED_MULTIPLIER
+    end
+    
+    -- clamp max x velocity
     if player.xVel > maxSpeed then
         player.xVel = maxSpeed
-	elseif player.xVel < -maxSpeed then
-		player.xVel = -maxSpeed
+    elseif player.xVel < -maxSpeed then
+        player.xVel = -maxSpeed
     end
    
     -- apply drag
@@ -275,7 +274,7 @@ function UpdatePlayerMovement()
         player.xVel = 0
     end
     
-	--check for jumping players that have landed on the ground.
+    --check for jumping players that have landed on the ground.
     if player.y > GROUND_HEIGHT - TILE_SIZE then
         player.y = GROUND_HEIGHT - TILE_SIZE
         player.yVel = 0
@@ -286,80 +285,80 @@ end
 
 --update running and crouching
 function UpdateLocomotionState()
-	if player.state ~= STATE_JUMPING and requests.run then
-		player.state = STATE_RUNNING
-	end
-	
-	if player.state == STATE_RUNNING and not requests.run then
-		player.state = STATE_WALKING
-	end
-	
-	if player.state ~= STATE_JUMPING and requests.crouch then
-		player.state = STATE_CROUCHING
-	end
-	
-	if player.state == STATE_CROUCHING and not requests.crouch then
-		player.state = STATE_WALKING
-	end
+    if player.state ~= STATE_JUMPING and requests.run then
+        player.state = STATE_RUNNING
+    end
+    
+    if player.state == STATE_RUNNING and not requests.run then
+        player.state = STATE_WALKING
+    end
+    
+    if player.state ~= STATE_JUMPING and requests.crouch then
+        player.state = STATE_CROUCHING
+    end
+    
+    if player.state == STATE_CROUCHING and not requests.crouch then
+        player.state = STATE_WALKING
+    end
 end
 
 --reset all requests. Player input may
 --set some of these to true during the 
 --next Update()
 function ClearActionRequests()
-	requests.fire = false
-	requests.run = false
-	requests.crouch = false
-	requests.jump = false
+    requests.fire = false
+    requests.run = false
+    requests.crouch = false
+    requests.jump = false
 end
 
 function UpdatePlayer()
-	ReadPlayerInput()
-	UpdatePlayerFireDirection()
-	UpdatePlayerMovement()
-	UpdateLocomotionState()
-		
-	--updating firing
-	if fireTimer == 0 and requests.fire then
+    ReadPlayerInput()
+    UpdatePlayerFireDirection()
+    UpdatePlayerMovement()
+    UpdateLocomotionState()
+        
+    --updating firing
+    if fireTimer == 0 and requests.fire then
         Fire()
     end
-	
-	ClearActionRequests()
+    
+    ClearActionRequests()
 end
 
 function DrawHud()
-	--draw controller warning (optional)
-	if not IsControllerAttached(0) then
-		DrawText("Please attach a controller.", 16, 16, font, 255, 255, 255)
-	else
-		DrawText("Press start to configure controls.", 16, 16, font, 255, 255, 255)
-	end
+    --draw controller warning (optional)
+    if not IsControllerAttached(0) then
+        DrawText("Please attach a controller.", 16, 16, font, 255, 255, 255)
+    else
+        DrawText("Press start to configure controls.", 16, 16, font, 255, 255, 255)
+    end
 end
 
 function DrawBullets()
-	for i = 1, #bullets do
-		DrawImage(bullets[i].image, bullets[i].x, bullets[i].y, 0, BULLET_SCALE)
-	end
+    for i = 1, #bullets do
+        DrawImage(bullets[i].image, bullets[i].x, bullets[i].y, 0, BULLET_SCALE)
+    end
 end
 
 function DrawPlayer()
-	local playerImage = nil
-	
-	if player.state == STATE_CROUCHING then
-		playerImage = images.crouch
-	elseif player.state == STATE_RUNNING then
-		if player.xVel == 0 then
-			playerImage = images.idle
-		elseif player.xVel > 0 then
-			playerImage = images.right
-		else
-			playerImage = images.left
-		end
-	else
-		playerImage = images.idle
-	end
-	
-	DrawImage(playerImage, player.x, player.y)
+    local playerImage = nil
+    
+    if player.state == STATE_CROUCHING then
+        playerImage = images.crouch
+    elseif player.state == STATE_RUNNING then
+        if player.xVel == 0 then
+            playerImage = images.idle
+        elseif player.xVel > 0 then
+            playerImage = images.right
+        else
+            playerImage = images.left
+        end
+    else
+        playerImage = images.idle
+    end
+    
+    DrawImage(playerImage, player.x, player.y)
 end
 
 function DrawGround()
@@ -373,89 +372,89 @@ end
 --handles input for the button config menu.
 --user can select the action (fire, jump, etc.) by pressing up or down.
 --pressing a face button (or whatever is mapped to 0-N on the controller) will 
---	assign the selected action to that button.
+--  assign the selected action to that button.
 function UpdateButtonMapper()
-	--change selected action in menu if user presses up or down
-	local inputY = GetInputY(0)
-	
-	if not buttonConfigOptionChangedLastUpdate then
-		if inputY < 0 then
-			buttonConfigSelectedOption = buttonConfigSelectedOption - 1
-		elseif inputY > 0 then
-			buttonConfigSelectedOption = buttonConfigSelectedOption + 1
-		end
-		
-		--wrap list
-		if buttonConfigSelectedOption >= NUM_CONFIGURABLE_BUTTONS then
-			buttonConfigSelectedOption = 0
-		elseif buttonConfigSelectedOption < 0 then
-			buttonConfigSelectedOption = NUM_CONFIGURABLE_BUTTONS - 1
-		end
-	end
-	
-	buttonConfigOptionChangedLastUpdate = math.abs(inputY) > 0
-	
-	-- if user presses a (debounced) face button, assign the
-	-- currently selected action to that button.
-	if not buttonConfigAssignmentChangedLastUpdate then
-		for i = 0, 3 do
-			if ReadControllerButton(0, i) then
-				local handler = nil
-				--this happens to be the order of the actions in the menu
-				if buttonConfigSelectedOption == 0 then handler = doFire
-				elseif buttonConfigSelectedOption == 1 then handler = doJump
-				elseif buttonConfigSelectedOption == 2 then handler = doRun
-				elseif buttonConfigSelectedOption == 3 then handler = doCrouch end
-				
-				local oldButton = FindButton(handler)
-				local oldHandler = commands[i]
-				
-				--early out if button is trying to swap with itself.
-				if i == oldButton then break end
-				
-				--swap button handlers
-				commands[i] = handler
-				commands[oldButton] = oldHandler
-				
-				buttonConfigAssignmentChangedLastUpdate = true
-			end
-		end
-	else --must release all face buttons before user can reassign again
-		local anyButtonPressed = false
-		for i = 0, NUM_CONFIGURABLE_BUTTONS - 1 do
-			if ReadControllerButton(0, i) then
-				anyButtonPressed = true
-			end
-		end
-		
-		if not anyButtonPressed then
-			buttonConfigAssignmentChangedLastUpdate = false
-		end
-	end
+    --change selected action in menu if user presses up or down
+    local inputY = GetInputY(0)
+    
+    if not buttonConfigOptionChangedLastUpdate then
+        if inputY < 0 then
+            buttonConfigSelectedOption = buttonConfigSelectedOption - 1
+        elseif inputY > 0 then
+            buttonConfigSelectedOption = buttonConfigSelectedOption + 1
+        end
+        
+        --wrap list
+        if buttonConfigSelectedOption >= NUM_CONFIGURABLE_BUTTONS then
+            buttonConfigSelectedOption = 0
+        elseif buttonConfigSelectedOption < 0 then
+            buttonConfigSelectedOption = NUM_CONFIGURABLE_BUTTONS - 1
+        end
+    end
+    
+    buttonConfigOptionChangedLastUpdate = math.abs(inputY) > 0
+    
+    -- if user presses a (debounced) face button, assign the
+    -- currently selected action to that button.
+    if not buttonConfigAssignmentChangedLastUpdate then
+        for i = 0, 3 do
+            if ReadControllerButton(0, i) then
+                local handler = nil
+                --this happens to be the order of the actions in the menu
+                if buttonConfigSelectedOption == 0 then handler = doFire
+                elseif buttonConfigSelectedOption == 1 then handler = doJump
+                elseif buttonConfigSelectedOption == 2 then handler = doRun
+                elseif buttonConfigSelectedOption == 3 then handler = doCrouch end
+                
+                local oldButton = FindButton(handler)
+                local oldHandler = commands[i]
+                
+                --early out if button is trying to swap with itself.
+                if i == oldButton then break end
+                
+                --swap button handlers
+                commands[i] = handler
+                commands[oldButton] = oldHandler
+                
+                buttonConfigAssignmentChangedLastUpdate = true
+            end
+        end
+    else --must release all face buttons before user can reassign again
+        local anyButtonPressed = false
+        for i = 0, NUM_CONFIGURABLE_BUTTONS - 1 do
+            if ReadControllerButton(0, i) then
+                anyButtonPressed = true
+            end
+        end
+        
+        if not anyButtonPressed then
+            buttonConfigAssignmentChangedLastUpdate = false
+        end
+    end
 end
 
 function DrawButtonMapper(x, y, kearning)
-	--instructions
-	DrawText("Press a face button to assign the selected command.", 16, 16, font, 127, 127, 127)
-	DrawText("Press Start to exit.", 16, 48, font, 127, 127, 127)
-	
-	--button mapper
-	DrawText("Fire:   " .. FindButton(doFire), x, y + kearning * 0, bigFont, 255, 255, 255)
-	DrawText("Jump:   " .. FindButton(doJump), x, y + kearning * 1, bigFont, 255, 255, 255)
-	DrawText("Run:    " .. FindButton(doRun), x, y + kearning * 2, bigFont, 255, 255, 255)
-	DrawText("Crouch: " .. FindButton(doCrouch), x, y + kearning * 3, bigFont, 255, 255, 255)
-	
-	--highlight selected option
-	local rectX = x
-	local rectY = y + kearning * buttonConfigSelectedOption
-	local rectW = 530
-	local rectH = 120
-	
-	SetDrawColor(255, 255, 128, 255)
+    --instructions
+    DrawText("Press a face button to assign the selected command.", 16, 16, font, 127, 127, 127)
+    DrawText("Press Start to exit.", 16, 48, font, 127, 127, 127)
+    
+    --button mapper
+    DrawText("Fire:   " .. FindButton(doFire), x, y + kearning * 0, bigFont, 255, 255, 255)
+    DrawText("Jump:   " .. FindButton(doJump), x, y + kearning * 1, bigFont, 255, 255, 255)
+    DrawText("Run:    " .. FindButton(doRun), x, y + kearning * 2, bigFont, 255, 255, 255)
+    DrawText("Crouch: " .. FindButton(doCrouch), x, y + kearning * 3, bigFont, 255, 255, 255)
+    
+    --highlight selected option
+    local rectX = x
+    local rectY = y + kearning * buttonConfigSelectedOption
+    local rectW = 530
+    local rectH = 120
+    
+    SetDrawColor(255, 255, 128, 255)
     DrawRect(rectX, rectY, rectW, rectH)
-	
-	SetDrawColor(255, 255, 64, 64)
-	FillRect(rectX, rectY, rectW, rectH)
+    
+    SetDrawColor(255, 255, 64, 64)
+    FillRect(rectX, rectY, rectW, rectH)
 end
 
 ------------------------------------------------------------------------------
@@ -465,35 +464,35 @@ end
 function Start()
     CreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT)
     SetWindowTitle("Button Remapping Demo")
-	
-	LoadAssets()
-		
-	TILE_SIZE = GetImageHeight(images.ground)
-	GROUND_HEIGHT = SCREEN_HEIGHT - TILE_SIZE
-	
-	InitPlayer()
+    
+    LoadAssets()
+        
+    TILE_SIZE = GetImageHeight(images.ground)
+    GROUND_HEIGHT = SCREEN_HEIGHT - TILE_SIZE
+    
+    InitPlayer()
 end
 
 function Update()
-	UpdatePause()
-	
-	if gameMode == MODE_PLAY then
-		UpdateBullets()
-		UpdatePlayer()
-	elseif gameMode == MODE_INPUT_CONFIG then
-		UpdateButtonMapper()
-	end
+    UpdatePause()
+    
+    if gameMode == MODE_PLAY then
+        UpdateBullets()
+        UpdatePlayer()
+    elseif gameMode == MODE_INPUT_CONFIG then
+        UpdateButtonMapper()
+    end
 end
 
 function Draw()
-	if gameMode == MODE_PLAY then
-		ClearScreen(68, 136, 204)
-		DrawHud()
-		DrawBullets()	
-		DrawPlayer()
-		DrawGround()
-	elseif gameMode == MODE_INPUT_CONFIG then
-		ClearScreen(0, 0, 0)
-		DrawButtonMapper(80, 96, 120)
-	end
+    if gameMode == MODE_PLAY then
+        ClearScreen(68, 136, 204)
+        DrawHud()
+        DrawBullets()   
+        DrawPlayer()
+        DrawGround()
+    elseif gameMode == MODE_INPUT_CONFIG then
+        ClearScreen(0, 0, 0)
+        DrawButtonMapper(80, 96, 120)
+    end
 end
