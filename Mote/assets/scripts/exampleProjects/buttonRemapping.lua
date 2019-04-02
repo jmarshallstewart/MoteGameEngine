@@ -433,20 +433,20 @@ function UpdateButtonMapper()
     end
 end
 
-function DrawButtonMapper(x, y, kearning)
+function DrawButtonMapper(x, y, leading)
     --instructions
     DrawText("Press a face button to assign the selected command.", 16, 16, font, 127, 127, 127)
     DrawText("Press Start to exit.", 16, 48, font, 127, 127, 127)
     
     --button mapper
-    DrawText("Fire:   " .. FindButton(doFire), x, y + kearning * 0, bigFont, 255, 255, 255)
-    DrawText("Jump:   " .. FindButton(doJump), x, y + kearning * 1, bigFont, 255, 255, 255)
-    DrawText("Run:    " .. FindButton(doRun), x, y + kearning * 2, bigFont, 255, 255, 255)
-    DrawText("Crouch: " .. FindButton(doCrouch), x, y + kearning * 3, bigFont, 255, 255, 255)
+    DrawText("Fire:   " .. FindButton(doFire), x, y + leading * 0, bigFont, 255, 255, 255)
+    DrawText("Jump:   " .. FindButton(doJump), x, y + leading * 1, bigFont, 255, 255, 255)
+    DrawText("Run:    " .. FindButton(doRun), x, y + leading * 2, bigFont, 255, 255, 255)
+    DrawText("Crouch: " .. FindButton(doCrouch), x, y + leading * 3, bigFont, 255, 255, 255)
     
     --highlight selected option
     local rectX = x
-    local rectY = y + kearning * buttonConfigSelectedOption
+    local rectY = y + leading * buttonConfigSelectedOption
     local rectW = 530
     local rectH = 120
     
