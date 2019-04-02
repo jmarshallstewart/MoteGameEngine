@@ -41,9 +41,9 @@ START_BUTTON_ID = 7
 
 --ux management state
 gameMode = MODE_PLAY
-startWasPressedLastUpdate = false
-buttonConfigOptionChangedLastUpdate = false
-buttonConfigAssignmentChangedLastUpdate = false
+startWasPressed = false
+selectionChanged = false
+buttonChanged = false
 buttonConfigSelectedOption = 0
 
 --container for images
@@ -119,12 +119,12 @@ end
 --(but ignore multiple requests to toggle until START button has been released.)
 function UpdatePause()
     local startPressed = ReadControllerButton(0, START_BUTTON_ID)
-    if not startWasPressedLastUpdate and startPressed then
+    if not startWasPressed and startPressed then
         if gameMode == MODE_PLAY then gameMode = MODE_INPUT_CONFIG
         elseif gameMode == MODE_INPUT_CONFIG then gameMode = MODE_PLAY end
     end
     
-    startWasPressedLastUpdate = startPressed
+    startWasPressed = startPressed
 end
 
 --Load fonts and images used in this example.
@@ -377,7 +377,7 @@ function UpdateButtonMapper()
     --change selected action in menu if user presses up or down
     local inputY = GetInputY(0)
     
-    if not buttonConfigOptionChangedLastUpdate then
+    if not selectionChanged then
         if inputY < 0 then
             buttonConfigSelectedOption = buttonConfigSelectedOption - 1
         elseif inputY > 0 then
@@ -392,11 +392,11 @@ function UpdateButtonMapper()
         end
     end
     
-    buttonConfigOptionChangedLastUpdate = math.abs(inputY) > 0
+    selectionChanged = math.abs(inputY) > 0
     
     -- if user presses a (debounced) face button, assign the
     -- currently selected action to that button.
-    if not buttonConfigAssignmentChangedLastUpdate then
+    if not buttonChanged then
         for i = 0, 3 do
             if ReadControllerButton(0, i) then
                 local handler = nil
@@ -416,7 +416,7 @@ function UpdateButtonMapper()
                 commands[i] = handler
                 commands[oldButton] = oldHandler
                 
-                buttonConfigAssignmentChangedLastUpdate = true
+                buttonChanged = true
             end
         end
     else --must release all face buttons before user can reassign again
@@ -428,7 +428,7 @@ function UpdateButtonMapper()
         end
         
         if not anyButtonPressed then
-            buttonConfigAssignmentChangedLastUpdate = false
+            buttonChanged = false
         end
     end
 end
