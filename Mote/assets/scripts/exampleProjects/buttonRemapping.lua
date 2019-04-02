@@ -190,8 +190,8 @@ function InitPlayer()
     player.speed = 1
     player.maxSpeed = 8
     player.drag = 0.85 
-    player.jumpImpulse = 45
-    player.gravity = 0.5
+    player.jumpImpulse = 25
+    player.gravity = 0.05
 end
 
 --only switch fire directions if player moves
