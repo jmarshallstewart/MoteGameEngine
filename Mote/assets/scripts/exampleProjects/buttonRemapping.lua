@@ -33,6 +33,7 @@ RUN_SPEED_MULTIPLIER = 3.0
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 NUM_CONFIGURABLE_BUTTONS = 4
+START_BUTTON_ID = 7
 
 ------------------------------------------------------------------------------
 -- global data
@@ -95,7 +96,7 @@ commands[3] = doRun
 ------------------------------------------------------------------------------
 
 function ReadPlayerInput()
-	for i = 0, 3 do
+	for i = 0, NUM_CONFIGURABLE_BUTTONS - 1 do
 		if ReadControllerButton(0, i) then
 			commands[i].execute()
 		end
@@ -103,7 +104,7 @@ function ReadPlayerInput()
 end
 
 function FindButton(command)
-	for i = 0, 3 do
+	for i = 0, NUM_CONFIGURABLE_BUTTONS - 1 do
 		if commands[i] == command then
 			return i
 		end
@@ -117,7 +118,7 @@ end
 --toggle between game and config menu when START button pressed.
 --(but ignore multiple requests to toggle until START button has been released.)
 function UpdatePause()
-	local startPressed = ReadControllerButton(0, 7)
+	local startPressed = ReadControllerButton(0, START_BUTTON_ID)
 	if not startWasPressedLastUpdate and startPressed then
 		if gameMode == MODE_PLAY then gameMode = MODE_INPUT_CONFIG
 		elseif gameMode == MODE_INPUT_CONFIG then gameMode = MODE_PLAY end
@@ -371,7 +372,7 @@ end
 
 --handles input for the button config menu.
 --user can select the action (fire, jump, etc.) by pressing up or down.
---pressing a face button (or whatever is mapped to 0-3 on the controller) will 
+--pressing a face button (or whatever is mapped to 0-N on the controller) will 
 --	assign the selected action to that button.
 function UpdateButtonMapper()
 	--change selected action in menu if user presses up or down
@@ -421,7 +422,7 @@ function UpdateButtonMapper()
 		end
 	else --must release all face buttons before user can reassign again
 		local anyButtonPressed = false
-		for i = 0,3 do
+		for i = 0, NUM_CONFIGURABLE_BUTTONS - 1 do
 			if ReadControllerButton(0, i) then
 				anyButtonPressed = true
 			end
