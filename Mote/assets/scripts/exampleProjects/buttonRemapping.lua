@@ -9,7 +9,7 @@
 -- constants
 ------------------------------------------------------------------------------
 
---modes
+--game modes
 MODE_PLAY = 0
 MODE_INPUT_CONFIG = 1
 
@@ -20,6 +20,7 @@ STATE_CROUCHING = 2
 STATE_JUMPING = 3
 
 --bullet tweaks
+BULLET_SCALE = 4.0
 BULLET_SPEED = 10
 SHOTS_PER_SECOND = 8
 MS_PER_SHOT = 1000 / SHOTS_PER_SECOND
@@ -336,7 +337,7 @@ end
 
 function DrawBullets()
 	for i = 1, #bullets do
-		DrawImage(bullets[i].image, bullets[i].x, bullets[i].y, 0, 4.0)
+		DrawImage(bullets[i].image, bullets[i].x, bullets[i].y, 0, BULLET_SCALE)
 	end
 end
 
