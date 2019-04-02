@@ -193,10 +193,8 @@ function InitPlayer()
     player.gravity = 0.5
 end
 
-function UpdatePlayer()
-	ReadPlayerInput()
-	
-	--only switch fire directions if player moves
+--only switch fire directions if player moves
+function UpdatePlayerFireDirection()
 	if math.abs(player.xVel) > 0 then
 		if player.xVel < 0 then
 			fireDirection = -1
@@ -204,7 +202,10 @@ function UpdatePlayer()
 			fireDirection = 1
 		end
 	end
-	
+end
+
+--handles moving and jumping for the player
+function UpdatePlayerMovement()
 	if requests.jump and player.state ~= STATE_JUMPING then
         player.yVel = -player.jumpImpulse
         player.state = STATE_JUMPING
@@ -276,7 +277,10 @@ function UpdatePlayer()
         player.yAcc = 0
         player.state = STATE_WALKING
     end
-	
+end
+
+--update running and crouching
+function UpdateLocomotionState()
 	if player.state ~= STATE_JUMPING and requests.run then
 		player.state = STATE_RUNNING
 	end
@@ -292,16 +296,27 @@ function UpdatePlayer()
 	if player.state == STATE_CROUCHING and not requests.crouch then
 		player.state = STATE_WALKING
 	end
-	
-	if fireTimer == 0 and requests.fire then
-        Fire()
-    end
-	
-	--clear input signals
+end
+
+function ClearActionRequests()
 	requests.fire = false
 	requests.run = false
 	requests.crouch = false
 	requests.jump = false
+end
+
+function UpdatePlayer()
+	ReadPlayerInput()
+	UpdatePlayerFireDirection()
+	UpdatePlayerMovement()
+	UpdateLocomotionState()
+		
+	--updating firing
+	if fireTimer == 0 and requests.fire then
+        Fire()
+    end
+	
+	ClearActionRequests()
 end
 
 function DrawHud()
@@ -347,8 +362,11 @@ function DrawGround()
     end
 end
 
+--handles input for the button config menu.
+--user can select the action (fire, jump, etc.) by pressing up or down.
+--pressing a face button (or whatever is mapped to 0-3 on the controller) will 
+--	assign the selected action to that button.
 function UpdateButtonMapper()
-	
 	--change selected action in menu if user presses up or down
 	local inputY = GetInputY(0)
 	
