@@ -13,39 +13,46 @@
 MODE_PLAY = 0
 MODE_INPUT_CONFIG = 1
 
---states
+--player states
 STATE_WALKING = 0
 STATE_RUNNING = 1
 STATE_CROUCHING = 2
 STATE_JUMPING = 3
 
+--bullet tweaks
 BULLET_SPEED = 10
 SHOTS_PER_SECOND = 8
 MS_PER_SHOT = 1000 / SHOTS_PER_SECOND
 
+--movement tweaks
 CROUCH_SPEED_MULTIPLIER = 0.1
 RUN_SPEED_MULTIPLIER = 3.0
 
+--hardware constants
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-
 NUM_CONFIGURABLE_BUTTONS = 4
 
 ------------------------------------------------------------------------------
 -- global data
 ------------------------------------------------------------------------------
 
+--ux management state
 gameMode = MODE_PLAY
 startWasPressedLastUpdate = false
 buttonConfigOptionChangedLastUpdate = false
 buttonConfigAssignmentChangedLastUpdate = false
 buttonConfigSelectedOption = 0
+
+--container for images
 images = {}
 
+--fire management state
 fireDirection = 1
 fireTimer = 0
 bullets = {}
 
+--action request state
 requests = {}
 requests.fire = false
 requests.run = false
@@ -55,6 +62,7 @@ requests.jump = false
 ------------------------------------------------------------------------------
 -- commands
 ------------------------------------------------------------------------------
+
 doFire = {}
 function doFire.execute()
 	requests.fire = true
@@ -100,10 +108,13 @@ function FindButton(command)
 		end
 	end
 	
-	--@TODO: do something sensible here.
+	--provides visual cue in button config
+	--menu that a command is not mapped.
 	return -1
 end
 
+--toggle between game and config menu when START button pressed.
+--(but ignore multiple requests to toggle until START button has been released.)
 function UpdatePause()
 	local startPressed = ReadControllerButton(0, 7)
 	if not startWasPressedLastUpdate and startPressed then
@@ -114,6 +125,7 @@ function UpdatePause()
 	startWasPressedLastUpdate = startPressed
 end
 
+--Load fonts and images used in this example.
 function LoadAssets()
 	font = LoadFont("fonts/8_bit_pusab.ttf", 16)
 	bigFont = LoadFont("fonts/8_bit_pusab.ttf", 64)
@@ -126,11 +138,13 @@ function LoadAssets()
 	images.fireball = LoadImage("images/tiles32/fireball.png")
 end
 
+--add a new bullet to the world, originating from the player.
 function Fire()
     fireTimer = fireTimer + MS_PER_SHOT
     
     bullet = {}
 	bullet.image = images.fireball
+	--adjust for size of player and size of bullet
     bullet.x = player.x + TILE_SIZE / 2 - GetImageWidth(bullet.image) / 2
     bullet.y = player.y + TILE_SIZE / 4 - GetImageHeight(bullet.image) / 2
     bullet.xVel = BULLET_SPEED * fireDirection
@@ -146,19 +160,17 @@ function UpdateBullets()
         end
     end
 	    		
+	--move all bullets, and destroy bullets that have left the screen.			
     for i = #bullets, 1, -1 do
         bullets[i].x = bullets[i].x + bullets[i].xVel
 		
 		local w = GetImageWidth(bullets[i].image)
 		local h = GetImageHeight(bullets[i].image)
 		
-        if bullets[i].x > SCREEN_WIDTH + w then
-            table.remove(bullets, i)
-		elseif bullets[i].x < -w then
-			table.remove(bullets, i)
-		elseif bullets[i].y > SCREEN_HEIGHT + h then
-            table.remove(bullets, i)
-		elseif bullets[i].y < -h then
+        if 	   bullets[i].x > SCREEN_WIDTH + w 
+			or bullets[i].x < -w
+			or bullets[i].y > SCREEN_HEIGHT + h
+            or bullets[i].y < -h then
 			table.remove(bullets, i)
         end
     end
@@ -336,6 +348,8 @@ function DrawGround()
 end
 
 function UpdateButtonMapper()
+	
+	--change selected action in menu if user presses up or down
 	local inputY = GetInputY(0)
 	
 	if not buttonConfigOptionChangedLastUpdate then
@@ -355,10 +369,13 @@ function UpdateButtonMapper()
 	
 	buttonConfigOptionChangedLastUpdate = math.abs(inputY) > 0
 	
+	-- if user presses a (debounced) face button, assign the
+	-- currently selected action to that button.
 	if not buttonConfigAssignmentChangedLastUpdate then
 		for i = 0, 3 do
 			if ReadControllerButton(0, i) then
 				local handler = nil
+				--this happens to be the order of the actions in the menu
 				if buttonConfigSelectedOption == 0 then handler = doFire
 				elseif buttonConfigSelectedOption == 1 then handler = doJump
 				elseif buttonConfigSelectedOption == 2 then handler = doRun
@@ -367,22 +384,17 @@ function UpdateButtonMapper()
 				local oldButton = FindButton(handler)
 				local oldHandler = commands[i]
 				
+				--early out if button is trying to swap with itself.
 				if i == oldButton then break end
 				
-				Log("old button was " .. oldButton)
-
-				if oldHandler == doFire then Log("taking from doFire") end	
-				if oldHandler == doJump then Log("taking from doJump") end
-				if oldHandler == doRun then Log("taking from doRun") end
-				if oldHandler == doCrouch then Log("taking from doCrouch") end
-				
+				--swap button handlers
 				commands[i] = handler
 				commands[oldButton] = oldHandler
 				
 				buttonConfigAssignmentChangedLastUpdate = true
 			end
 		end
-	else --release all buttons before we allow user to reassign again
+	else --must release all face buttons before user can reassign again
 		local anyButtonPressed = false
 		for i = 0,3 do
 			if ReadControllerButton(0, i) then
