@@ -180,8 +180,8 @@ function InitPlayer()
 	player = {}
 	player.state = STATE_WALKING
     player.image = images.idle
-    player.x = SCREEN_WIDTH / 2 - GetImageWidth(images.idle) / 2
-    player.y = GROUND_HEIGHT - GetImageHeight(images.idle)
+    player.x = SCREEN_WIDTH / 2 - TILE_SIZE / 2
+    player.y = GROUND_HEIGHT - TILE_SIZE
     player.xVel = 0
     player.yVel = 0
     player.xAcc = 0
@@ -239,10 +239,11 @@ function UpdatePlayerMovement()
         player.xVel = 0
     end
       
+	--update player's position based on their velocity
     player.x = player.x + player.xVel
     player.y = player.y + player.yVel
    
-    -- clamp max x velocity
+    -- adjust speed for crouching and running players.
 	local maxSpeed = player.maxSpeed
 	
 	if player.state == STATE_CROUCHING then
@@ -251,6 +252,7 @@ function UpdatePlayerMovement()
 		maxSpeed = maxSpeed * RUN_SPEED_MULTIPLIER
 	end
 	
+	-- clamp max x velocity
     if player.xVel > maxSpeed then
         player.xVel = maxSpeed
 	elseif player.xVel < -maxSpeed then
@@ -271,6 +273,7 @@ function UpdatePlayerMovement()
         player.xVel = 0
     end
     
+	--check for jumping players that have landed on the ground.
     if player.y > GROUND_HEIGHT - TILE_SIZE then
         player.y = GROUND_HEIGHT - TILE_SIZE
         player.yVel = 0
@@ -298,6 +301,9 @@ function UpdateLocomotionState()
 	end
 end
 
+--reset all requests. Player input may
+--set some of these to true during the 
+--next Update()
 function ClearActionRequests()
 	requests.fire = false
 	requests.run = false
