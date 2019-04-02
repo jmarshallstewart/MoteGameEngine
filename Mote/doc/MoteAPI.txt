@@ -382,3 +382,42 @@ GetImageHeight(reference imageAsset)
 	returns: int (height of the image in pixels)
 	
 	Returns the height of the image measured in pixels.
+	
+IsControllerAttached(int playerIndex)
+	playerIndex: index of the player (0 = player 1, 1 = player 2, etc.)
+	
+	returns: bool 
+	
+	Returns true if a controller is attached and assigned to this playerIndex.
+	
+ReadControllerButton(int playerIndex, int buttonIndex)
+	playerIndex: index of the player (0 = player 1, 1 = player 2, etc.)
+	buttonIndex: each button on a controller has an id that is a number, starting from 0.
+	
+	returns: bool 
+	
+	Returns if the requested button is currently being pressed.
+	
+ReadControllerHat(int playerIndex)
+	playerIndex: index of the player (0 = player 1, 1 = player 2, etc.)
+	
+	returns: int (current output of controller hat) 
+	
+	A hat is a controller component that can be in a neutral position or set
+	to a direction. For example, the D-Pad seen on most controllers is a hat.
+	This function returns the current hat output for the given player. (Using
+	XBOX 360 controller mappings, 0 = neutral, consecutive integers indicate
+	other directions).
+
+ReadControllerAxis(int playerIndex, int axisIndex)
+	playerIndex: index of the player (0 = player 1, 1 = player 2, etc.)
+	axisIndex: each axis on a controller has an id that is a number, starting from 0.
+	
+	returns: float (current value of the axis)
+	
+	An axis is a controller input that can read variations in between simply "on" 
+	and "off." The thumbsticks on game pads give a reading along two axes: one for 
+	left-right and one for top-bottom. The triggers on modern game pads can give 
+	different values based on how far down they are pressed, from -1 (not pressed
+	at all), to 1 (pressed down fully). This function returns the current value of the
+	requested axis.
