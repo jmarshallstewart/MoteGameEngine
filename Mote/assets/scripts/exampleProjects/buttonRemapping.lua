@@ -3,6 +3,8 @@
 -- the player is taken to a screen where they can assign which face buttons go
 -- with which action.
 
+-- This example assumes controllers with XINPUT aka XBOX 360 button mappings.
+
 ------------------------------------------------------------------------------
 -- constants
 ------------------------------------------------------------------------------
@@ -27,11 +29,17 @@ RUN_SPEED_MULTIPLIER = 3.0
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
+NUM_CONFIGURABLE_BUTTONS = 4
+
 ------------------------------------------------------------------------------
 -- global data
 ------------------------------------------------------------------------------
 
 gameMode = MODE_PLAY
+startWasPressedLastUpdate = false
+buttonConfigOptionChangedLastUpdate = false
+buttonConfigAssignmentChangedLastUpdate = false
+buttonConfigSelectedOption = 0
 images = {}
 
 fireDirection = 1
@@ -45,11 +53,70 @@ requests.crouch = false
 requests.jump = false
 
 ------------------------------------------------------------------------------
+-- commands
+------------------------------------------------------------------------------
+doFire = {}
+function doFire.execute()
+	requests.fire = true
+end
+
+doRun = {}
+function doRun.execute()
+	requests.run = true
+end
+
+doCrouch = {}
+function doCrouch.execute()
+	requests.crouch = true
+end
+
+doJump = {}
+function doJump.execute()
+	requests.jump = true
+end
+
+commands = {}
+commands[0] = doJump
+commands[1] = doFire
+commands[2] = doCrouch
+commands[3] = doRun
+
+------------------------------------------------------------------------------
 -- helper functions
 ------------------------------------------------------------------------------
 
+function ReadPlayerInput()
+	for i = 0, 3 do
+		if ReadControllerButton(0, i) then
+			commands[i].execute()
+		end
+	end
+end
+
+function FindButton(command)
+	for i = 0, 3 do
+		if commands[i] == command then
+			return i
+		end
+	end
+	
+	--@TODO: do something sensible here.
+	return -1
+end
+
+function UpdatePause()
+	local startPressed = ReadControllerButton(0, 7)
+	if not startWasPressedLastUpdate and startPressed then
+		if gameMode == MODE_PLAY then gameMode = MODE_INPUT_CONFIG
+		elseif gameMode == MODE_INPUT_CONFIG then gameMode = MODE_PLAY end
+	end
+	
+	startWasPressedLastUpdate = startPressed
+end
+
 function LoadAssets()
 	font = LoadFont("fonts/8_bit_pusab.ttf", 16)
+	bigFont = LoadFont("fonts/8_bit_pusab.ttf", 64)
 	
 	images.idle = LoadImage("images/tiles32/idle.png")
 	images.left = LoadImage("images/tiles32/left.png")
@@ -115,11 +182,8 @@ function InitPlayer()
 end
 
 function UpdatePlayer()
-	requests.jump = ReadControllerButton(0, 0)
-	requests.fire = ReadControllerButton(0, 1)
-	requests.crouch = ReadControllerButton(0, 2)
-	requests.run = ReadControllerButton(0, 3)
-
+	ReadPlayerInput()
+	
 	--only switch fire directions if player moves
 	if math.abs(player.xVel) > 0 then
 		if player.xVel < 0 then
@@ -271,6 +335,91 @@ function DrawGround()
     end
 end
 
+function UpdateButtonMapper()
+	local inputY = GetInputY(0)
+	
+	if not buttonConfigOptionChangedLastUpdate then
+		if inputY < 0 then
+			buttonConfigSelectedOption = buttonConfigSelectedOption - 1
+		elseif inputY > 0 then
+			buttonConfigSelectedOption = buttonConfigSelectedOption + 1
+		end
+		
+		--wrap list
+		if buttonConfigSelectedOption >= NUM_CONFIGURABLE_BUTTONS then
+			buttonConfigSelectedOption = 0
+		elseif buttonConfigSelectedOption < 0 then
+			buttonConfigSelectedOption = NUM_CONFIGURABLE_BUTTONS - 1
+		end
+	end
+	
+	buttonConfigOptionChangedLastUpdate = math.abs(inputY) > 0
+	
+	if not buttonConfigAssignmentChangedLastUpdate then
+		for i = 0, 3 do
+			if ReadControllerButton(0, i) then
+				local handler = nil
+				if buttonConfigSelectedOption == 0 then handler = doFire
+				elseif buttonConfigSelectedOption == 1 then handler = doJump
+				elseif buttonConfigSelectedOption == 2 then handler = doRun
+				elseif buttonConfigSelectedOption == 3 then handler = doCrouch end
+				
+				local oldButton = FindButton(handler)
+				local oldHandler = commands[i]
+				
+				if i == oldButton then break end
+				
+				Log("old button was " .. oldButton)
+
+				if oldHandler == doFire then Log("taking from doFire") end	
+				if oldHandler == doJump then Log("taking from doJump") end
+				if oldHandler == doRun then Log("taking from doRun") end
+				if oldHandler == doCrouch then Log("taking from doCrouch") end
+				
+				commands[i] = handler
+				commands[oldButton] = oldHandler
+				
+				buttonConfigAssignmentChangedLastUpdate = true
+			end
+		end
+	else --release all buttons before we allow user to reassign again
+		local anyButtonPressed = false
+		for i = 0,3 do
+			if ReadControllerButton(0, i) then
+				anyButtonPressed = true
+			end
+		end
+		
+		if not anyButtonPressed then
+			buttonConfigAssignmentChangedLastUpdate = false
+		end
+	end
+end
+
+function DrawButtonMapper(x, y, kearning)
+	--instructions
+	DrawText("Press a face button to assign the selected command.", 16, 16, font, 127, 127, 127)
+	DrawText("Press Start to exit.", 16, 48, font, 127, 127, 127)
+	
+	--button mapper
+	DrawText("Fire:   " .. FindButton(doFire), x, y + kearning * 0, bigFont, 255, 255, 255)
+	DrawText("Jump:   " .. FindButton(doJump), x, y + kearning * 1, bigFont, 255, 255, 255)
+	DrawText("Run:    " .. FindButton(doRun), x, y + kearning * 2, bigFont, 255, 255, 255)
+	DrawText("Crouch: " .. FindButton(doCrouch), x, y + kearning * 3, bigFont, 255, 255, 255)
+	
+	--highlight selected option
+	local rectX = x
+	local rectY = y + kearning * buttonConfigSelectedOption
+	local rectW = 530
+	local rectH = 120
+	
+	SetDrawColor(255, 255, 128, 255)
+    DrawRect(rectX, rectY, rectW, rectH)
+	
+	SetDrawColor(255, 255, 64, 64)
+	FillRect(rectX, rectY, rectW, rectH)
+end
+
 ------------------------------------------------------------------------------
 -- core functions
 ------------------------------------------------------------------------------
@@ -288,14 +437,25 @@ function Start()
 end
 
 function Update()
-	UpdateBullets()
-	UpdatePlayer()
+	UpdatePause()
+	
+	if gameMode == MODE_PLAY then
+		UpdateBullets()
+		UpdatePlayer()
+	elseif gameMode == MODE_INPUT_CONFIG then
+		UpdateButtonMapper()
+	end
 end
 
 function Draw()
-	ClearScreen(68, 136, 204)
-	DrawHud()
-	DrawBullets()	
-	DrawPlayer()
-	DrawGround()
+	if gameMode == MODE_PLAY then
+		ClearScreen(68, 136, 204)
+		DrawHud()
+		DrawBullets()	
+		DrawPlayer()
+		DrawGround()
+	elseif gameMode == MODE_INPUT_CONFIG then
+		ClearScreen(0, 0, 0)
+		DrawButtonMapper(80, 96, 120)
+	end
 end
